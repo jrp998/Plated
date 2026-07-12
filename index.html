@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1E3F74">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Plated">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Plated</title>
+<style>
+/* ============ PLATED · Mediterranean Tile ============
+   majolica ink #1E3F74 · chalk #F8F9F6 · lemon #E9B824
+   sea green #2E6E63 (healthy) · azure #2E5CA8 (placemat)
+====================================================== */
+:root{
+  --head:#1E3F74; --ink:#1C2B45; --paper:#F8F9F6; --accent:#E9B824; --accenttxt:#2A2205;
+  --accentink:#B08A0E; --pos:#2E6E63; --postxt:#E8F4F0; --wash:#E7EDF2; --line:#D2DAE2;
+  --sub:#5E6B80; --puncol:#4E6180; --metal:#C8CDD6;
+  --disp:'Iowan Old Style','Palatino Linotype','Book Antiqua',Georgia,serif;
+  --body:-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  --r:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%}
+body{
+  font-family:var(--body); background:var(--paper); color:var(--ink);
+  min-height:100%; padding-bottom:calc(76px + env(safe-area-inset-bottom));
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
+input{font-family:inherit}
+
+header{
+  background:linear-gradient(180deg,#1B3866,#244982); color:#F5F8FB;
+  padding:calc(14px + env(safe-area-inset-top)) 20px 14px;
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:40;
+  border-bottom:3px solid var(--accent);
+}
+.wordmark{font-family:var(--disp); font-style:italic; font-size:26px}
+.wordmark::after{content:'.'; color:var(--accent); font-style:normal; font-weight:700}
+.kids-toggle{
+  display:flex; align-items:center; gap:7px;
+  border:1.5px solid rgba(245,248,251,.4); border-radius:999px;
+  padding:6px 13px; font-size:13.5px; font-weight:600; color:#F5F8FB;
+  transition:background .2s,border-color .2s,color .2s;
+}
+.kids-toggle .dot{width:9px;height:9px;border-radius:50%;background:rgba(245,248,251,.4);transition:background .2s}
+.kids-toggle.on{background:var(--accent); border-color:var(--accent); color:var(--accenttxt)}
+.kids-toggle.on .dot{background:var(--accenttxt)}
+
+.view{display:none; padding:20px 18px 30px; max-width:560px; margin:0 auto}
+.view.active{display:block}
+.eyebrow{font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--sub); font-weight:700; margin-bottom:6px}
+h2{font-family:var(--disp); font-weight:600; font-size:24px; margin-bottom:4px}
+.lede{color:var(--sub); font-size:14.5px; line-height:1.45; margin-bottom:18px}
+
+/* ---------- table setting ---------- */
+.plate-wrap{display:flex; flex-direction:column; align-items:center; margin:6px 0 6px}
+.setting{display:flex; align-items:center; justify-content:center; gap:6px; width:100%}
+.cutlery{flex:0 0 auto; width:30px; color:var(--metal)}
+.cutlery svg{width:100%; height:auto; display:block; filter:drop-shadow(0 2px 2px rgba(18,38,72,.3))}
+.placemat{
+  flex:0 0 auto; border-radius:50%; padding:13px;
+  background:radial-gradient(circle at 40% 32%, #2E5CA8, #1E3F74 75%);
+  box-shadow:0 14px 34px rgba(18,38,72,.35), inset 0 1px 3px rgba(255,255,255,.28);
+}
+.plate{
+  width:min(66vw,262px); height:min(66vw,262px); position:relative; border-radius:50%;
+  transition:transform .18s ease; display:block;
+}
+.plate:active{transform:scale(.97)}
+.plate > svg{position:absolute; inset:0; width:100%; height:100%}
+.plate .ctr{
+  position:absolute; inset:20.5%; border-radius:50%; overflow:hidden;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:8px;
+}
+.plate .food{font-size:52px; line-height:1; filter:drop-shadow(0 3px 4px rgba(18,38,72,.18))}
+.plate .pname{
+  font-family:var(--disp); font-size:16.5px; font-weight:600; line-height:1.2; margin-top:6px;
+  color:#2c2c28; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; max-width:100%;
+}
+.plate .pmeta{margin-top:5px; font-size:11px; color:#77756a; font-weight:600; white-space:nowrap}
+.plate.spin .food{animation:tumble .5s ease}
+@keyframes tumble{0%{transform:rotate(0) scale(1)}45%{transform:rotate(180deg) scale(.6)}100%{transform:rotate(360deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.plate.spin .food{animation:none}}
+.pun{
+  margin-top:14px; font-family:var(--disp); font-style:italic; font-size:14.5px;
+  color:var(--puncol); text-align:center; min-height:20px; max-width:320px; line-height:1.45;
+}
+.pun::before{content:'“'} .pun::after{content:'”'}
+.pun:empty::before,.pun:empty::after{content:''}
+.toggle-row{display:flex; gap:10px; margin-top:16px; width:100%; max-width:360px}
+.healthy-toggle{
+  flex:1; display:flex; align-items:center; justify-content:center; gap:8px;
+  border:1.5px solid var(--line); border-radius:14px; padding:11px; font-size:13.5px; font-weight:700;
+  color:var(--sub); background:#fff; transition:all .2s;
+}
+.healthy-toggle .leaf{font-size:15px; filter:grayscale(1); opacity:.6; transition:all .2s}
+.healthy-toggle.on{background:var(--pos); border-color:var(--pos); color:var(--postxt)}
+.healthy-toggle.on .leaf{filter:none; opacity:1}
+.plate-actions{display:flex; gap:10px; margin-top:10px; width:100%; max-width:360px}
+.btn{flex:1; padding:13px 16px; border-radius:14px; font-size:14.5px; font-weight:700; text-align:center; transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--accent); color:var(--accenttxt)}
+.btn-ghost{background:var(--wash); color:var(--ink)}
+.btn-forest{background:var(--head); color:#F5F8FB}
+
+/* ---------- seasonal ---------- */
+.season-block{margin-top:26px}
+.season-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px}
+.season-head .eyebrow{margin:0}
+.season-head .snow{font-size:13px; color:var(--sub); font-weight:600}
+.season-strip{display:flex; gap:10px; overflow-x:auto; padding:2px 2px 8px; scrollbar-width:none}
+.season-strip::-webkit-scrollbar{display:none}
+.scard{flex:0 0 auto; width:118px; background:#fff; border:1px solid var(--line); border-radius:16px; padding:14px 10px; text-align:center; transition:transform .1s}
+.scard:active{transform:scale(.96)}
+.scard .emo{font-size:30px}
+.scard .n{font-size:12.5px; font-weight:700; margin-top:7px; line-height:1.25}
+.scard .t{font-size:11px; color:var(--sub); font-weight:600; margin-top:4px}
+
+/* ---------- week planner ---------- */
+.week-block{margin-top:26px}
+.week-rows{display:flex; flex-direction:column; gap:8px; margin-top:12px}
+.wday{display:flex; align-items:center; gap:12px; background:#fff; border:1px solid var(--line); border-radius:16px; padding:11px 14px; width:100%; text-align:left}
+.wday:active{transform:scale(.985)}
+.wday .d{flex:0 0 auto; width:44px; font-family:var(--disp); font-weight:700; font-size:14px; color:var(--postxt); background:var(--pos); border-radius:10px; text-align:center; padding:8px 0}
+.wday.fri .d{background:var(--accent); color:var(--accenttxt)}
+.wday .emo{font-size:26px; flex:0 0 auto}
+.wday .b{flex:1; min-width:0}
+.wday .n{font-weight:700; font-size:14.5px; line-height:1.2}
+.wday .m{font-size:12px; color:var(--sub); margin-top:2px; font-weight:600}
+.wday.fri .m::after{content:'  ·  Friday treat'; color:var(--accentink); font-weight:700}
+.reuse-note{font-size:12.5px; color:var(--pos); background:var(--wash); border-radius:12px; padding:9px 12px; margin-top:10px; line-height:1.5; font-weight:600}
+.week-actions{display:flex; gap:10px; margin-top:12px}
+.week-actions .btn{font-size:13.5px; padding:11px}
+
+/* ---------- chips, search, cards ---------- */
+.chip-row{display:flex; gap:8px; overflow-x:auto; padding:2px 0 12px; scrollbar-width:none}
+.chip-row::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto; padding:8px 14px; border-radius:999px; background:var(--wash); font-size:13px; font-weight:600; color:var(--ink)}
+.chip.on{background:var(--head); color:#F5F8FB}
+.search{width:100%; padding:12px 16px; border-radius:14px; border:1.5px solid var(--line); background:#fff; font-size:15px; margin-bottom:12px; color:var(--ink)}
+.search:focus{outline:2px solid var(--accent); outline-offset:1px; border-color:transparent}
+.cards{display:flex; flex-direction:column; gap:10px}
+.card{display:flex; align-items:center; gap:14px; background:#fff; border:1px solid var(--line); border-radius:var(--r); padding:14px 16px; text-align:left; width:100%; transition:transform .1s}
+.card:active{transform:scale(.985)}
+.card .emo{font-size:34px; flex:0 0 auto; width:48px; text-align:center}
+.card .body{flex:1; min-width:0}
+.card .name{font-weight:700; font-size:15.5px; line-height:1.25}
+.card .meta{font-size:12.5px; color:var(--sub); margin-top:3px; display:flex; gap:8px; flex-wrap:wrap}
+.tag-protein{color:var(--accentink); font-weight:700}
+.tag-healthy{color:var(--pos); font-weight:700}
+.tag-kid{color:var(--accentink); font-weight:700}
+.card .addlist{flex:0 0 auto; width:38px; height:38px; border-radius:12px; background:var(--wash); font-size:20px; font-weight:700; color:var(--ink); display:flex; align-items:center; justify-content:center}
+.card .addlist.in{background:var(--head); color:#F5F8FB}
+.empty{color:var(--sub); font-size:14px; text-align:center; padding:30px 10px; line-height:1.5}
+.why{font-size:12.5px; color:var(--ink); background:var(--wash); border-radius:10px; padding:6px 10px; margin-top:7px; line-height:1.4; display:inline-block}
+.promote{font-size:12.5px; font-weight:700; color:var(--accentink); margin-top:8px; display:inline-block}
+
+/* ---------- hidden library ---------- */
+.hidden-block{margin-top:30px}
+.hidden-toggle{width:100%; text-align:left; font-size:13px; font-weight:700; color:var(--sub); padding:12px 2px; border-top:1.5px solid var(--line)}
+.hidden-rows{display:flex; flex-direction:column; gap:8px; padding-top:4px}
+.hrow{display:flex; align-items:center; gap:11px; background:var(--wash); border-radius:14px; padding:10px 14px}
+.hrow .e{font-size:22px}
+.hrow .n{flex:1; font-size:13.5px; font-weight:600; color:var(--sub)}
+.hrow .restore{font-size:12.5px; font-weight:700; color:var(--accentink); padding:6px 10px}
+
+/* ---------- grocery list ---------- */
+.aisle{margin-bottom:18px}
+.aisle h3{font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--sub); border-bottom:1.5px solid var(--line); padding-bottom:6px; margin-bottom:8px; font-weight:700}
+.gitem{display:flex; align-items:center; gap:12px; padding:9px 2px; width:100%; text-align:left}
+.gitem .box{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;transition:all .15s}
+.gitem.done .box{background:var(--pos);border-color:var(--pos)}
+.gitem .gname{flex:1;font-size:15px}
+.gitem.done .gname{text-decoration:line-through;color:var(--sub)}
+.gitem .gqty{font-size:12.5px;color:var(--sub);font-weight:600}
+.planned-strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:14px;scrollbar-width:none}
+.planned-strip::-webkit-scrollbar{display:none}
+.pmeal{flex:0 0 auto;display:flex;align-items:center;gap:7px;background:var(--head);color:#F5F8FB;border-radius:999px;padding:7px 8px 7px 13px;font-size:13px;font-weight:600}
+.pmeal .x{width:20px;height:20px;border-radius:50%;background:rgba(245,248,251,.2);font-size:12px;display:flex;align-items:center;justify-content:center}
+.list-tools{display:flex;gap:10px;margin-bottom:16px}
+.list-tools .btn{flex:1;font-size:13.5px;padding:11px}
+
+/* ---------- sheet ---------- */
+.sheet-bg{position:fixed;inset:0;background:rgba(18,32,58,.5);z-index:60;opacity:0;pointer-events:none;transition:opacity .25s}
+.sheet-bg.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--paper);border-radius:24px 24px 0 0;max-height:88vh;overflow-y:auto;transform:translateY(102%);transition:transform .3s cubic-bezier(.32,.72,.25,1);padding:10px 22px calc(28px + env(safe-area-inset-bottom));max-width:560px;margin:0 auto}
+.sheet.open{transform:translateY(0)}
+.grab{width:42px;height:5px;border-radius:99px;background:var(--line);margin:6px auto 16px}
+.sheet .emo-big{font-size:56px;text-align:center;margin-bottom:8px}
+.sheet h2{text-align:center;font-size:26px}
+.sheet .spun{font-family:var(--disp);font-style:italic;text-align:center;color:var(--puncol);font-size:13.5px;margin-top:6px}
+.sheet .smeta{display:flex;justify-content:center;gap:14px;margin:10px 0 4px;font-size:13px;color:var(--sub);font-weight:600;flex-wrap:wrap}
+.kidnote{background:#FBF3D8;border:1.5px solid var(--accent);border-radius:14px;padding:12px 14px;font-size:13.5px;line-height:1.5;margin:14px 0 4px}
+.kidnote b{color:var(--accentink)}
+.side-note{font-size:13px;color:var(--pos);background:var(--wash);border-radius:12px;padding:9px 12px;margin:12px 0 0;line-height:1.5;font-weight:600}
+.sheet h3{font-family:var(--disp);font-size:18px;margin:20px 0 10px;font-weight:600}
+.ing-list{list-style:none}
+.ing-list li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+.ing-list li span:last-child{color:var(--sub);font-size:13px;font-weight:600;white-space:nowrap}
+.steps{list-style:none;counter-reset:st}
+.steps li{counter-increment:st;display:flex;gap:14px;padding:11px 0;font-size:14.8px;line-height:1.55}
+.steps li::before{content:counter(st);flex:0 0 auto;width:27px;height:27px;border-radius:50%;background:var(--pos);color:var(--postxt);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.sheet-actions{display:flex;gap:10px;margin-top:20px}
+.remove-lib{display:block;margin:16px auto 4px;font-size:13px;font-weight:700;color:#A34432;padding:8px 14px}
+
+/* ---------- nav ---------- */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:linear-gradient(0deg,#1B3866,#244982);display:flex;justify-content:space-around;padding:8px 6px calc(8px + env(safe-area-inset-bottom));border-top:2px solid rgba(233,184,36,.6)}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;color:rgba(245,248,251,.55);font-size:11px;font-weight:700;padding:6px 0;border-radius:12px}
+nav button .ico{font-size:20px;line-height:1}
+nav button.on{color:var(--accent)}
+nav button .badge{position:absolute;transform:translate(14px,-4px);background:var(--accent);color:var(--accenttxt);border-radius:99px;font-size:10px;min-width:16px;height:16px;padding:0 4px;display:flex;align-items:center;justify-content:center}
+button:focus-visible,.card:focus-visible,input:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="china" cx="41%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#FFFFFF"/><stop offset="58%" stop-color="#FCFBF7"/>
+      <stop offset="86%" stop-color="#F1EEE4"/><stop offset="100%" stop-color="#E2DDCC"/>
+    </radialGradient>
+    <radialGradient id="wellShade" cx="50%" cy="48%" r="50%">
+      <stop offset="58%" stop-color="#5E5744" stop-opacity="0"/>
+      <stop offset="63%" stop-color="#5E5744" stop-opacity=".16"/>
+      <stop offset="66%" stop-color="#5E5744" stop-opacity=".05"/>
+      <stop offset="70%" stop-color="#FFFFFF" stop-opacity=".55"/>
+      <stop offset="74%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="glint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".9"/><stop offset="60%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="1.6"/></filter>
+    <filter id="softer"><feGaussianBlur stdDeviation="3"/></filter>
+    <g id="plateArt">
+      <circle cx="100" cy="100" r="97" fill="url(#china)"/>
+      <circle cx="100" cy="100" r="96.4" fill="none" stroke="#C9C2AD" stroke-width="1.2" opacity=".8"/>
+      <circle cx="100" cy="100" r="94" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity=".85"/>
+      <circle cx="100" cy="100" r="100" fill="url(#wellShade)"/>
+      <circle cx="100" cy="100" r="63.5" fill="none" stroke="#8D8468" stroke-width="1.1" opacity=".38" filter="url(#soft)"/>
+      <circle cx="100" cy="100" r="61.5" fill="none" stroke="#FFFFFF" stroke-width="1.6" opacity=".8" filter="url(#soft)"/>
+      <path d="M 40 52 A 78 78 0 0 1 96 22" fill="none" stroke="url(#glint)" stroke-width="7" stroke-linecap="round" filter="url(#softer)" opacity=".8"/>
+    </g>
+  </defs>
+</svg>
+
+<header>
+  <div class="wordmark">Plated</div>
+  <button class="kids-toggle" id="kidsBtn" aria-pressed="false"><span class="dot"></span> Kids</button>
+</header>
+
+<section class="view active" id="view-tonight">
+  <div class="eyebrow">Dinner, sorted</div>
+  <h2>What's on tonight?</h2>
+  <p class="lede">Tap the plate to spin. Pulls from your house favourites.</p>
+  <div class="plate-wrap">
+    <div class="setting">
+      <div class="cutlery" aria-hidden="true"><svg viewBox="0 0 24 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 4v16M12 4v16M17 4v16"/><path d="M7 20c0 5 2 7 5 7s5-2 5-7"/><path d="M12 27v49"/></svg></div>
+      <div class="placemat">
+        <button class="plate" id="plate" aria-label="Spin for a dinner idea">
+          <svg viewBox="0 0 200 200" aria-hidden="true"><use href="#plateArt"/></svg>
+          <div class="ctr">
+            <div class="food" id="plateEmo">🍽️</div>
+            <div class="pname" id="plateName">Give it a spin</div>
+            <div class="pmeta" id="plateMeta"></div>
+          </div>
+        </button>
+      </div>
+      <div class="cutlery" aria-hidden="true"><svg viewBox="0 0 24 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 4c-3 8-3 18 0 24l2 2v46"/><path d="M10 4c4 6 5 16 2 26"/></svg></div>
+    </div>
+    <div class="pun" id="punLine"></div>
+    <div class="toggle-row">
+      <button class="healthy-toggle" id="healthyBtn" aria-pressed="false"><span class="leaf">🌿</span> Healthy spins only</button>
+    </div>
+    <div class="plate-actions">
+      <button class="btn btn-ghost" id="spinBtn">Spin again</button>
+      <button class="btn btn-primary" id="cookBtn">Open recipe</button>
+    </div>
+  </div>
+  <div class="season-block">
+    <div class="season-head"><div class="eyebrow">In season</div><div class="snow" id="seasonLabel"></div></div>
+    <div class="season-strip" id="seasonStrip"></div>
+  </div>
+  <div class="week-block">
+    <div class="eyebrow">The week ahead</div>
+    <button class="btn btn-forest" id="planBtn" style="width:100%;margin-top:10px">🗓️ Plan my week</button>
+    <div id="weekWrap"></div>
+  </div>
+</section>
+
+<section class="view" id="view-browse">
+  <div class="eyebrow">House favourites</div>
+  <h2>The rotation</h2>
+  <p class="lede">Everything you love. Tap for the recipe, + for the grocery list. Anything that doesn't fit can be removed from inside its recipe.</p>
+  <input class="search" id="searchBox" type="search" placeholder="Search meals or ingredients…">
+  <div class="chip-row" id="filterChips"></div>
+  <div class="cards" id="browseCards"></div>
+  <div class="hidden-block" id="hiddenBlock"></div>
+</section>
+
+<section class="view" id="view-explore">
+  <div class="eyebrow">Off the beaten plate</div>
+  <h2>Try something new</h2>
+  <p class="lede">Picked to match your palate. Cook one you like? Promote it to the rotation.</p>
+  <div class="cards" id="exploreCards"></div>
+</section>
+
+<section class="view" id="view-list">
+  <div class="eyebrow">Shop once</div>
+  <h2>Grocery list</h2>
+  <p class="lede" id="listLede">Add meals from Browse or Explore and everything lands here, grouped by aisle.</p>
+  <div class="planned-strip" id="plannedStrip"></div>
+  <div class="list-tools" id="listTools" style="display:none">
+    <button class="btn btn-ghost" id="clearTicked">Clear ticked</button>
+    <button class="btn btn-ghost" id="clearAll">Start over</button>
+  </div>
+  <div id="groceryGroups"></div>
+</section>
+
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true">
+  <div class="grab"></div>
+  <div id="sheetContent"></div>
+</div>
+
+<nav>
+  <button data-tab="tonight" class="on"><span class="ico">🍽️</span>Tonight</button>
+  <button data-tab="browse"><span class="ico">📖</span>Browse</button>
+  <button data-tab="explore"><span class="ico">🧭</span>Explore</button>
+  <button data-tab="list" id="listTab"><span class="ico">🧺</span>List</button>
+</nav>
+
+<script>
+'use strict';
+const AISLES = {M:'Meat & seafood', V:'Fruit & veg', D:'Dairy & eggs', B:'Bakery', P:'Pantry', F:'Frozen'};
+
+const RECIPES = [
+{id:'tacos', name:'Beef tacos', emo:'🌮', mins:25, protein:true, h:1, f:1, tags:['quick','texmex'],
+ pun:'Let\'s taco \'bout how good tonight is going to be.',
+ kid:'Serve deconstructed: mild mince, cheese, avocado and soft tortilla strips. Season his portion before the spice goes in.',
+ ing:[['Beef mince','500 g','M'],['Taco shells or small tortillas','1 pack','P'],['Taco seasoning','1 sachet','P'],['Tomato','2','V'],['Iceberg lettuce','½','V'],['Avocado','1','V'],['Tasty cheese, grated','1 cup','D'],['Sour cream','small tub','D'],['Lime','1','V']],
+ steps:['Brown the mince in a hot pan, breaking it up well, 5–6 min.','Set aside a plain portion for the little one, then stir seasoning + a splash of water into the rest; simmer 5 min.','Warm shells or tortillas per packet.','Dice tomato, shred lettuce, slice avocado, grate cheese.','Build at the table — mince, cheese, salad, sour cream, squeeze of lime.']},
+
+{id:'chilli', name:'Chilli con carne', emo:'🌶️', mins:45, protein:true, h:1, s:['winter','autumn'], tags:['texmex','batch'],
+ pun:'This one\'s bean there, done that — and it\'s still un-bean-lievable.',
+ kid:'Make it mild in the pot and add chilli flakes to adult bowls at the table. Serve his over rice, slightly mashed — beans are great toddler iron.',
+ ing:[['Beef mince','500 g','M'],['Red kidney beans','2 × 400 g tins','P'],['Crushed tomatoes','2 × 400 g tins','P'],['Onion','1','V'],['Garlic','3 cloves','V'],['Red capsicum','1','V'],['Cumin + smoked paprika','2 tsp each','P'],['Chilli flakes','to serve','P'],['Rice','1½ cups','P'],['Sour cream','small tub','D']],
+ steps:['Soften diced onion, garlic and capsicum in oil, 4 min.','Add mince; brown well, 6 min.','Stir in cumin and paprika, cook 1 min until fragrant.','Add tomatoes and drained beans; simmer uncovered 25–30 min until thick.','Cook rice meanwhile. Serve with sour cream; chilli flakes at the table.']},
+
+{id:'reuben', name:'Reuben sandwiches', emo:'🥪', mins:20, protein:true, f:1, tags:['quick'],
+ pun:'You always make the rye-t call.',
+ kid:'Corned beef and cheese are salty — small amounts only. Better: buttered rye soldiers, cheese and cucumber sticks alongside.',
+ ing:[['Corned beef / pastrami, sliced','300 g','M'],['Rye bread','8 slices','B'],['Sauerkraut','1 cup','P'],['Swiss cheese, sliced','8 slices','D'],['Mayonnaise','⅓ cup','P'],['Tomato sauce + Worcestershire','1 tbsp each','P'],['Pickles','4','P'],['Butter','40 g','D']],
+ steps:['Mix mayo, tomato sauce, Worcestershire and a chopped pickle into a quick Russian dressing.','Butter the outside of each bread slice.','Layer: dressing, cheese, beef, squeezed-dry sauerkraut, cheese, dressing.','Toast in a sandwich press or pan over medium, 3–4 min a side, until golden and molten.','Halve, serve with remaining pickles.']},
+
+{id:'butterchicken', name:'Butter chicken + rice', emo:'🍛', mins:40, protein:true, f:1, tags:['curry','batch'],
+ pun:'Butter believe it\'s dinner time.',
+ kid:'Naturally toddler-friendly kept mild — creamy, no heat needed. Shred his chicken small and fold through rice.',
+ ing:[['Chicken thigh fillets','700 g','M'],['Greek yoghurt','½ cup','D'],['Garam masala + turmeric','2 tsp / 1 tsp','P'],['Butter','60 g','D'],['Onion','1','V'],['Garlic + ginger','3 cloves / thumb','V'],['Tomato passata','700 ml','P'],['Thickened cream','300 ml','D'],['Basmati rice','1½ cups','P'],['Coriander','½ bunch','V']],
+ steps:['Toss chopped chicken with yoghurt and half the spices; rest while you prep.','Melt butter; soften onion, garlic, ginger, 5 min.','Add remaining spices, then chicken; sear 5 min.','Pour in passata; simmer 15 min. Stir through cream, warm 5 more.','Serve on basmati with coriander.']},
+
+{id:'greencurry', name:'Thai green chicken curry', emo:'🍲', mins:30, protein:true, h:1, tags:['thai','quick'],
+ pun:'Green means go. Back for seconds, specifically.',
+ kid:'Green curry paste has real heat. Lift out chicken + veg for him before the paste, or make his bowl coconut rice + plain chicken.',
+ ing:[['Chicken thigh fillets','600 g','M'],['Green curry paste','3 tbsp','P'],['Coconut milk','2 × 400 ml tins','P'],['Green beans','200 g','V'],['Zucchini','1','V'],['Capsicum','1','V'],['Fish sauce','1 tbsp','P'],['Brown sugar','2 tsp','P'],['Jasmine rice','1½ cups','P'],['Thai basil or coriander','½ bunch','V']],
+ steps:['Fry curry paste in a splash of coconut cream until fragrant, 2 min.','Add sliced chicken; coat and sear 4 min.','Pour in coconut milk; simmer 10 min.','Add beans, zucchini and capsicum; simmer 6–8 min until just tender.','Season with fish sauce and sugar. Serve on jasmine rice with herbs.']},
+
+{id:'padthai', name:'Chicken pad thai', emo:'🍜', mins:30, protein:true, h:1, tags:['thai'],
+ pun:'Wok this way.',
+ kid:'Great toddler noodles — peanuts crushed fine or off his bowl entirely (whole nuts are a choking hazard), light sauce on his portion.',
+ ing:[['Chicken breast','400 g','M'],['Flat rice noodles','250 g','P'],['Eggs','2','D'],['Bean sprouts','1 cup','V'],['Spring onions','3','V'],['Crushed peanuts','⅓ cup','P'],['Tamarind puree','2 tbsp','P'],['Fish sauce','2 tbsp','P'],['Brown sugar','2 tbsp','P'],['Lime','1','V']],
+ steps:['Soak noodles per packet; drain. Mix tamarind, fish sauce and sugar into a sauce.','Stir-fry sliced chicken in a hot wok until golden; push aside.','Scramble eggs in the gap, then toss everything together with noodles and sauce, 2 min.','Fold through sprouts and spring onion; heat 1 min.','Top with peanuts and lime wedges.']},
+
+{id:'pestopasta', name:'Chicken pesto pasta', emo:'🍝', mins:20, protein:true, h:1, tags:['quick','pasta'],
+ pun:'Pesto? More like best-o.',
+ kid:'A reliable toddler win. Chop his pasta and chicken small; basil pesto is fine — just watch added parmesan salt.',
+ ing:[['Chicken breast','400 g','M'],['Short pasta','350 g','P'],['Basil pesto','½ jar (95 g)','P'],['Cherry tomatoes','1 punnet','V'],['Baby spinach','2 handfuls','V'],['Parmesan','to serve','D'],['Pine nuts (optional)','2 tbsp','P']],
+ steps:['Cook pasta in well-salted water; reserve a mug of pasta water.','Meanwhile pan-fry diced chicken until golden and cooked, 6–7 min.','Toss pasta, chicken, pesto and a splash of pasta water off the heat.','Fold in halved tomatoes and spinach until just wilted.','Parmesan and pine nuts over the top. Quarter the tomatoes on his plate.']},
+
+{id:'lasagne', name:'Beef lasagne', emo:'🫕', mins:80, protein:true, f:1, s:['winter','autumn'], tags:['batch','pasta'],
+ pun:'Layers of love. That\'s pasta-tively true.',
+ side:'A sharp rocket + parmesan salad is the classic counterweight.',
+ kid:'Perfect toddler food once cooled a little — soft layers, hidden veg. Freeze leftover squares for easy dinners.',
+ ing:[['Beef mince','750 g','M'],['Lasagne sheets','1 box','P'],['Crushed tomatoes','2 × 400 g tins','P'],['Onion + carrot + celery','1 each','V'],['Garlic','3 cloves','V'],['Butter + flour','60 g / ⅓ cup','P'],['Milk','750 ml','D'],['Tasty cheese, grated','2 cups','D'],['Parmesan','½ cup','D']],
+ steps:['Soften finely diced onion, carrot, celery and garlic, 6 min. Add mince; brown well.','Add tomatoes; simmer 25 min until rich. Season.','White sauce: melt butter, stir in flour 1 min, whisk in milk until thick. Add half the cheese.','Layer sauce–sheets–ragu three times; finish with white sauce and remaining cheeses.','Bake 180 °C for 35 min until bronzed. Rest 10 min before cutting.']},
+
+{id:'mezze', name:'Chicken mezze bowls', emo:'🥙', mins:35, protein:true, h:1, s:['summer','spring'], tags:['medi','bowls'],
+ pun:'Hummus a tune while you cook.',
+ kid:'Mezze is brilliant for self-feeding — hummus, cucumber, soft pita strips, shredded chicken. Skip olives if too salty.',
+ ing:[['Chicken thigh fillets','600 g','M'],['Smoked paprika + oregano + lemon','marinade','P'],['Hummus','1 tub','P'],['Pita bread','4','B'],['Cucumber','1','V'],['Cherry tomatoes','1 punnet','V'],['Red onion','½','V'],['Kalamata olives','½ cup','P'],['Greek yoghurt','½ cup','D'],['Couscous','1 cup','P']],
+ steps:['Marinate chicken in oil, paprika, oregano, lemon juice, 10 min (or overnight).','Grill or pan-fry chicken 4–5 min a side; rest, then slice.','Steep couscous in boiling water 5 min; fluff.','Chop cucumber, tomatoes, onion. Warm pitas.','Build bowls: couscous, chicken, salad, hummus, olives, yoghurt.']},
+
+{id:'burgers', name:'Smash burgers + sweet potato chips', emo:'🍔', mins:35, protein:true, f:1, tags:['airfryer','quick'],
+ pun:'Tonight is going to be a smashing success.',
+ side:'A quick slaw or garden salad cuts through if you want more than chips.',
+ kid:'Mini patty (no salt crust), cheese and soft bun pieces for him. Cut his sweet potato chips cooler and smaller.',
+ ing:[['Beef mince','500 g','M'],['Burger buns','4','B'],['Sweet potatoes','2 large','V'],['Cheese slices','4','D'],['Iceberg lettuce','¼','V'],['Tomato','1','V'],['Pickles','4','P'],['Mayo + mustard + tomato sauce','burger sauce','P'],['Cornflour','1 tbsp','P']],
+ steps:['Cut sweet potato into chips, toss with oil and cornflour; air fry 200 °C, 18–20 min, shaking halfway.','Roll mince into 4 loose balls; season outside only.','Smash balls flat in a screaming-hot pan; 2 min, flip, cheese on, 1 min.','Mix mayo, mustard, tomato sauce; toast buns cut-side down.','Stack: sauce, lettuce, patty, tomato, pickles.']},
+
+{id:'steakveg', name:'Steak with charred zucchini + capsicum', emo:'🥩', mins:30, protein:true, h:1, tags:['quick','lowcarb'],
+ pun:'The steaks have never been higher.',
+ side:'Garden salad or just extra charred veg — whatever the crisper offers.',
+ kid:'Slice his steak thin against the grain and cut the veg small. Skip resting-juice salt on his portion.',
+ ing:[['Scotch fillet or porterhouse','2 steaks (~500 g)','M'],['Zucchini','2','V'],['Red capsicum','2','V'],['Garlic','2 cloves','V'],['Butter','30 g','D'],['Lemon','1','V'],['Rosemary or thyme','2 sprigs','V']],
+ steps:['Bring steaks to room temp; pat dry, oil and season.','Char thick-sliced zucchini and capsicum in a hot pan or air fryer with oil and garlic; lemon squeezed over.','Sear steaks 2–3 min a side for medium-rare, basting with butter and herbs at the end.','Rest steaks 5 min under foil.','Slice and serve over the veg, resting juices poured back over.']},
+
+{id:'airfryerchicken', name:'Air fryer crispy chicken thighs', emo:'🍗', mins:35, protein:true, h:1, tags:['airfryer','quick'],
+ pun:'Winner winner, air-fried dinner.',
+ kid:'Pull the crispy skin off his piece (the salt lives there) and shred the meat. Pairs with rice and soft zucchini.',
+ ing:[['Chicken thighs, bone-in skin-on','6','M'],['Smoked paprika + garlic powder + onion powder','1 tsp each','P'],['Rice','1½ cups','P'],['Zucchini','2','V'],['Lemon','1','V'],['Olive oil','2 tbsp','P']],
+ steps:['Pat thighs very dry; rub with oil and the spice mix.','Air fry skin-side down 190 °C for 12 min.','Flip; another 10–12 min until skin is shatter-crisp and juices run clear.','Steam rice; pan-soften zucchini rounds in olive oil.','Rest chicken 5 min; lemon over everything.']},
+
+{id:'roastchook', name:'Sunday roast chicken', emo:'🍗', mins:90, protein:true, h:1, s:['winter','autumn'], tags:['roast','batch'],
+ pun:'This chicken is poultry in motion.',
+ kid:'Roast dinners are toddler gold — soft carrots, potato, shredded breast. A spoonful of gravy is plenty.',
+ ing:[['Whole chicken','1.6–1.8 kg','M'],['Potatoes','800 g','V'],['Carrots','4','V'],['Brown onion','2','V'],['Garlic','1 head','V'],['Butter','60 g','D'],['Lemon','1','V'],['Gravy powder or pan gravy makings','—','P'],['Frozen peas','2 cups','F']],
+ steps:['Oven 200 °C. Pat chicken dry; rub with soft butter, salt, halved lemon inside.','Nestle on a bed of halved onions and garlic; roast 30 min.','Add chunked potatoes and carrots tossed in oil; roast 45–50 min more.','Rest chicken 15 min. Crank veg back in to crisp.','Gravy from pan juices; microwave peas. Carve and pile up plates.']},
+
+{id:'porkroast', name:'Pork roast with crackling', emo:'🍖', mins:150, protein:true, f:1, s:['winter','autumn'], tags:['roast','batch'],
+ pun:'That crackling? Simply boar-illiant.',
+ kid:'Soft pork shreds well for him — crackling is a choking risk at 21 months, so his stays crackle-free. Apple sauce is a guaranteed hit.',
+ ing:[['Pork shoulder or loin, skin on','1.5 kg','M'],['Potatoes','800 g','V'],['Pumpkin','600 g','V'],['Fennel seeds','1 tsp','P'],['Apple sauce','1 jar','P'],['Frozen peas','2 cups','F'],['Gravy makings','—','P'],['Olive oil + salt (for crackling)','—','P']],
+ steps:['Score the skin; pat bone-dry. Oil and salt into every cut, fennel over the meat.','Blast 240 °C for 25 min to set the crackling.','Drop to 180 °C; roast ~1 hr 15 (until 68 °C internal), veg in for the last 50 min.','Rest 15 min — crackling off, veg crisping.','Gravy, peas, apple sauce on the table. Fight over the crackling like adults.']},
+
+{id:'bakedfish', name:'Lemon baked fish + greens', emo:'🐟', mins:25, protein:true, h:1, tags:['quick','lowcarb'],
+ pun:'No time to mullet over — dinner\'s in 25.',
+ kid:'Flaky white fish is perfect toddler protein — triple-check his portion for bones, light on the lemon.',
+ ing:[['Firm white fish fillets (barramundi, ling)','3','M'],['Lemon','2','V'],['Butter','40 g','D'],['Green beans','250 g','V'],['Broccolini','1 bunch','V'],['Garlic','2 cloves','V'],['Baby potatoes','500 g','V'],['Dill or parsley','½ bunch','V']],
+ steps:['Boil halved baby potatoes 12–15 min until tender.','Oven 200 °C. Lay fish on baking paper; butter, lemon slices, garlic on top. Bake 12–14 min.','Steam or pan-toss beans and broccolini with olive oil.','Crush potatoes lightly with butter and herbs.','Plate fish over greens; pan butter spooned over.']},
+
+{id:'fishchips', name:'Air fryer fish + chips', emo:'🍟', mins:35, protein:true, f:1, tags:['airfryer'],
+ pun:'You batter believe it\'s Friday.',
+ kid:'Homemade crumbed fish beats takeaway sodium by a mile. Cool his chips; flake his fish checking for bones.',
+ ing:[['White fish fillets','3','M'],['Panko breadcrumbs','1½ cups','P'],['Eggs','2','D'],['Plain flour','½ cup','P'],['Potatoes','4 large','V'],['Frozen peas','2 cups','F'],['Lemon','1','V'],['Mayonnaise + capers (quick tartare)','—','P']],
+ steps:['Cut potatoes into chips; toss in oil. Air fry 200 °C, 20–22 min, shaking twice.','Flour → egg → panko each fillet.','Air fry fish (oil spray) 195 °C, 10–12 min, flipping once, until golden.','Microwave peas; stir chopped capers through mayo.','Lemon wedges, and dinner\'s done.']},
+
+{id:'spagbol', name:'Spaghetti Bolognese', emo:'🍝', mins:50, protein:true, h:1, tags:['pasta','batch'],
+ pun:'Past-a la vista, hunger.',
+ side:'Garden salad with a lemony dressing if you want green on the table.',
+ kid:'The classic. Chop his spaghetti short. Grate extra zucchini and carrot into the sauce — invisible veg.',
+ ing:[['Beef mince','500 g','M'],['Spaghetti','400 g','P'],['Crushed tomatoes','2 × 400 g tins','P'],['Onion + carrot + celery','1 each','V'],['Zucchini (grated, hidden)','1','V'],['Garlic','3 cloves','V'],['Tomato paste','2 tbsp','P'],['Parmesan','to serve','D'],['Basil','½ bunch','V']],
+ steps:['Soften finely diced onion, carrot, celery, garlic, 6 min.','Add mince; brown hard. Stir in tomato paste 1 min.','Add tomatoes and grated zucchini; simmer 30 min, lid off.','Cook spaghetti; toss with a ladle of sauce and pasta water.','Bowl up, sauce on top, parmesan and basil.']},
+
+{id:'gyros', name:'Chicken gyros with pita + hummus', emo:'🥙', mins:35, protein:true, h:1, tags:['medi','quick'],
+ pun:'Not all gyros wear capes.',
+ kid:'Soft pita, mild chicken, cucumber, yoghurt — practically designed for toddlers. Skip raw onion on his plate.',
+ ing:[['Chicken thigh fillets','600 g','M'],['Greek yoghurt','1 cup','D'],['Pita or Lebanese bread','4','B'],['Hummus','1 tub','P'],['Oregano + smoked paprika + lemon','marinade','P'],['Cucumber','1','V'],['Tomato','2','V'],['Red onion','½','V'],['Garlic','1 clove','V']],
+ steps:['Marinate sliced chicken: yoghurt (½ cup), oregano, paprika, lemon, oil — 15 min or overnight.','Quick tzatziki: grate + squeeze half the cucumber into remaining yoghurt with garlic.','Pan-fry or grill chicken hot until charred at the edges, 8–10 min.','Warm pitas; chop salad.','Load pitas: hummus, chicken, salad, tzatziki.']},
+
+{id:'sausagerolls', name:'Puff pastry sausage rolls', emo:'🥐', mins:45, protein:true, f:1, tags:['batch','airfryer'],
+ pun:'We are, quite literally, on a roll.',
+ side:'Cherry tomatoes and cucumber sticks make this a legitimate dinner.',
+ kid:'Homemade = you control the salt, and grated veg hides beautifully. Freeze a batch raw for later.',
+ ing:[['Pork or beef mince','500 g','M'],['Puff pastry sheets','3','F'],['Carrot (grated)','1','V'],['Zucchini (grated, squeezed)','1','V'],['Onion (grated)','½','V'],['Breadcrumbs','½ cup','P'],['Egg','1','D'],['Fennel seeds (optional)','1 tsp','P'],['Tomato sauce','to serve','P']],
+ steps:['Oven 200 °C. Mix mince, grated veg, breadcrumbs, half the beaten egg.','Halve each pastry sheet; log of filling along each, roll, seal seam-down.','Cut to size, brush with egg, snip steam vents.','Bake 25–30 min (or air fry 180 °C ~18 min in batches) until puffed and deep gold.','Cool 5 min — molten centres are a toddler trap. Tomato sauce mandatory.']},
+
+{id:'tavce', name:'Tavče gravče + kebapi', emo:'🫘', mins:75, protein:true, h:1, s:['winter','autumn'], tags:['balkan','batch'],
+ pun:'Tonight we are, in every sense, full of beans.',
+ kid:'Soft baked beans are excellent toddler food — mild paprika only. Slice his kebapi thin and cool.',
+ ing:[['Kebapi / čevapi (or thin beef sausages)','8','M'],['Dried white beans (or 3 tins butter beans)','400 g dry / 3 tins','P'],['Onion','2','V'],['Sweet paprika','1½ tbsp','P'],['Dried mint or parsley','1 tsp','P'],['Chilli (adults only)','1','V'],['Crusty bread','1 loaf','B'],['Olive oil','⅓ cup','P']],
+ steps:['If dried: soak beans overnight, simmer ~1 hr until tender. Tinned: rinse and skip ahead.','Fry sliced onion in generous oil until golden; stir in paprika off the heat.','Fold beans and onion oil together in a baking dish with a splash of cooking liquid; mint on top.','Bake 200 °C, 30 min, until the top blisters. Grill kebapi in the last 10.','Serve straight from the dish with bread. Chilli on the side for the grown-ups.']},
+
+{id:'moussaka', name:'Balkan moussaka', emo:'🍆', mins:90, protein:true, h:1, s:['winter','autumn'], tags:['balkan','batch'],
+ pun:'Hit moussaka one more time.',
+ kid:'Macedonian-style with potato layers — soft, mild, mashable. Perfect leftovers for daycare-day dinners.',
+ ing:[['Beef or pork mince','600 g','M'],['Potatoes','1 kg','V'],['Onion','2','V'],['Eggs','3','D'],['Milk','1 cup','D'],['Sweet paprika','1 tbsp','P'],['Garlic','3 cloves','V'],['Crushed tomatoes','400 g tin','P'],['Parsley','½ bunch','V']],
+ steps:['Brown mince with diced onion and garlic; stir in paprika and tomatoes, simmer 10 min.','Slice potatoes thin (5 mm).','Layer in an oiled dish: potato, mince, potato, mince, potato. Season each layer lightly.','Bake covered 190 °C, 45 min. Whisk eggs + milk; pour over, bake uncovered 20 min until set and golden.','Rest 10 min; parsley over.']},
+
+{id:'greektraybake', name:'Greek lemon chicken traybake', emo:'🍋', mins:70, protein:true, h:1, tags:['medi','roast','onepan'],
+ pun:'When life gives you lemons, roast a chook in them.',
+ kid:'One-pan, soft lemony potatoes, tender chicken. Shred his and go light on the olives.',
+ ing:[['Chicken thighs, bone-in','6','M'],['Potatoes','800 g','V'],['Lemon','2','V'],['Garlic','5 cloves','V'],['Dried oregano','1 tbsp','P'],['Chicken stock','½ cup','P'],['Kalamata olives','½ cup','P'],['Green beans','250 g','V'],['Feta','100 g','D']],
+ steps:['Oven 200 °C. Toss wedged potatoes, chicken, garlic, oregano, lemon juice + oil in a big tray.','Pour stock into the corner; chicken skin-up. Roast 45 min.','Scatter beans and olives; 15 min more until potatoes are golden at the edges.','Crumble feta over; lemon zest to finish.','Serve from the tray.']},
+
+{id:'friedrice', name:'Chicken + egg fried rice', emo:'🍚', mins:20, protein:true, h:1, tags:['quick','rice'],
+ pun:'Rice to see you again.',
+ kid:'Day-old rice, soft egg, peas and corn — a self-feeding dream. Dish his up before the soy goes in.',
+ ing:[['Chicken breast or leftover roast chicken','300 g','M'],['Cooked day-old rice','4 cups','P'],['Eggs','3','D'],['Frozen peas + corn','1½ cups','F'],['Spring onions','3','V'],['Garlic','2 cloves','V'],['Soy sauce','2 tbsp','P'],['Sesame oil','1 tsp','P']],
+ steps:['Hot wok: scramble eggs in oil; set aside.','Stir-fry diced chicken until golden; add garlic 30 sec.','Rice in, pressing and tossing until it sizzles, 3 min.','Peas, corn, egg back in; soy and sesame oil around the edge.','Spring onions through; serve immediately.']},
+
+{id:'burritobowl', name:'Burrito bowls', emo:'🥗', mins:30, protein:true, h:1, tags:['texmex','bowls','quick'],
+ pun:'Prepare for some truly bowl-d flavours.',
+ kid:'Deconstructed = toddler-proof. His gets rice, mild beans, cheese, avocado, corn — skip the salsa heat.',
+ ing:[['Chicken thigh fillets or beef mince','500 g','M'],['Rice','1½ cups','P'],['Black beans','400 g tin','P'],['Corn kernels','1 cup','F'],['Avocado','1','V'],['Cherry tomatoes','1 punnet','V'],['Tasty cheese','1 cup','D'],['Chipotle or taco seasoning','1 tbsp','P'],['Lime','1','V'],['Sour cream','small tub','D']],
+ steps:['Cook rice with a squeeze of lime at the end.','Toss chicken (or mince) in seasoning; pan-fry until charred and cooked.','Warm rinsed beans and corn.','Chop tomato and avocado.','Everyone builds their own bowl. Sour cream on top, lime over everything.']},
+
+{id:'pumpkinsoup', name:'Pumpkin soup + cheese toasties', emo:'🎃', mins:45, protein:false, h:1, s:['winter','autumn'], tags:['soup','batch','veg'],
+ pun:'Gourd evening. Gourd evening indeed.',
+ kid:'Smooth, sweet, mild — a toddler classic. Serve his lukewarm with toastie soldiers for dipping.',
+ ing:[['Butternut pumpkin','1.2 kg','V'],['Onion','1','V'],['Garlic','3 cloves','V'],['Chicken or veg stock','1 L','P'],['Thickened cream','150 ml','D'],['Nutmeg','pinch','P'],['Sourdough or sandwich bread','8 slices','B'],['Tasty cheese','8 slices','D'],['Butter','40 g','D']],
+ steps:['Soften diced onion and garlic in butter, 4 min.','Add chunked pumpkin and stock; simmer 20–25 min until collapsing.','Blitz smooth with a stick blender; cream and nutmeg in, season.','Cheese toasties in a pan or sandwich press until molten.','Bowls, a swirl of cream, toasties for dunking.']},
+
+{id:'lambshanks', name:'ALDI slow-cooked lamb shanks', emo:'🍖', mins:180, protein:true, f:1, s:['winter','autumn'], tags:['roast','batch'],
+ pun:'Shanks a million, ALDI.',
+ kid:'Fall-apart shank meat over mash is about as toddler-perfect as dinner gets. Skim the sauce fat and go light on his gravy.',
+ ing:[['ALDI lamb shanks (or plain shanks)','2–3','M'],['Potatoes (for mash)','800 g','V'],['Carrots','3','V'],['Celery','2 stalks','V'],['Onion','1','V'],['Red wine or extra stock','1 cup','P'],['Beef stock','2 cups','P'],['Tomato paste','2 tbsp','P'],['Rosemary','2 sprigs','V'],['Butter + milk (mash)','60 g / splash','D'],['Frozen peas','2 cups','F']],
+ steps:['Brown shanks hard on all sides; set aside. (Pre-sauced ALDI ones: straight to step 3.)','Soften diced onion, carrot, celery; tomato paste in for 1 min.','Wine and stock in with rosemary; shanks back in. Lid on.','Oven 160 °C for 2.5–3 hrs (or slow cooker low 6–7 hrs) until the meat waves at you.','Buttery mash, peas, shank on top, pan sauce reduced and spooned over.']},
+
+{id:'schnitzel', name:'Chicken schnitzel + garden salad', emo:'🍗', mins:35, protein:true, f:1, tags:['airfryer','quick'],
+ pun:'Don\'t be chicken — it\'s schnitty night.',
+ kid:'Air-fried schnitty cut into strips is prime toddler food. Hold the salt in his crumb portion.',
+ ing:[['Chicken breast','2 large','M'],['Panko breadcrumbs','1½ cups','P'],['Parmesan (into the crumb)','⅓ cup','D'],['Eggs','2','D'],['Plain flour','½ cup','P'],['Mixed salad leaves','1 bag','V'],['Cucumber','1','V'],['Cherry tomatoes','1 punnet','V'],['Lemon','1','V'],['Mayonnaise or gravy','to serve','P']],
+ steps:['Butterfly and flatten breasts to 1 cm.','Flour → egg → panko-parmesan crumb, pressing it on properly.','Air fry 195 °C, 12–14 min with oil spray, flipping once, until deep gold.','Toss salad with olive oil and lemon.','Lemon wedge over the schnitty. Mayo or gravy — house rules apply.']},
+
+{id:'zucchinislice', name:'Zucchini slice', emo:'🥒', mins:50, protein:true, h:1, s:['summer','spring'], tags:['veg','batch'],
+ pun:'Zucchini believe how easy this is.',
+ kid:'THE Australian toddler dinner. Soft, veg-loaded, holds together in little hands. Freezes brilliantly for daycare days.',
+ ing:[['Zucchini (grated)','3','V'],['Bacon (diced) or ham','200 g','M'],['Eggs','5','D'],['Self-raising flour','1 cup','P'],['Tasty cheese, grated','1 cup','D'],['Onion (grated)','1','V'],['Olive oil','⅓ cup','P'],['Cherry tomatoes (side salad)','1 punnet','V']],
+ steps:['Oven 180 °C. Grate zucchini; squeeze out the water like you mean it.','Whisk eggs and oil; fold in flour, cheese, zucchini, onion, bacon.','Into a lined slice tin.','Bake 30–35 min until set and golden at the edges.','Rest 10 min; cut into fingers. Tomatoes on the side.']},
+
+{id:'honeydrums', name:'Honey soy chicken drumsticks', emo:'🍯', mins:50, protein:true, h:1, tags:['airfryer','rice'],
+ pun:'Drum roll, please.',
+ kid:'Sticky drumstick meat pulled off the bone is a guaranteed win — wipe the glaze back on his portion (honey + soy = sugar + salt).',
+ ing:[['Chicken drumsticks','8','M'],['Honey','⅓ cup','P'],['Soy sauce','⅓ cup','P'],['Garlic + ginger','3 cloves / thumb','V'],['Sesame oil','1 tsp','P'],['Rice','1½ cups','P'],['Broccoli','1 head','V'],['Sesame seeds + spring onion','to serve','V']],
+ steps:['Marinate drumsticks in honey, soy, garlic, ginger, sesame oil — 15 min to overnight.','Air fry 190 °C, 22–25 min, turning twice (or bake 200 °C, 35 min).','Simmer leftover marinade 3 min into a glaze; brush over.','Rice on; steam broccoli.','Sesame and spring onion over. Napkins. Many napkins.']},
+
+{id:'beefstirfry', name:'Beef + capsicum stir-fry', emo:'🥡', mins:20, protein:true, h:1, tags:['quick','rice'],
+ pun:'Wok and roll, baby.',
+ kid:'Slice his beef paper-thin (or swap in extra soft veg) and dish up before the sauce concentrates.',
+ ing:[['Beef strips (rump or sirloin)','500 g','M'],['Red capsicum','2','V'],['Broccoli','1 head','V'],['Garlic + ginger','3 cloves / thumb','V'],['Oyster sauce','2 tbsp','P'],['Soy sauce','1 tbsp','P'],['Cornflour','2 tsp','P'],['Rice','1½ cups','P'],['Spring onions','2','V']],
+ steps:['Toss beef with cornflour and a splash of soy. Cook rice.','Screaming-hot wok: sear beef in batches, 1–2 min; remove.','Stir-fry capsicum and broccoli 3 min; garlic and ginger 30 sec.','Beef back in with oyster sauce, soy, splash of water; toss 1 min.','Over rice, spring onions on top.']},
+
+{id:'souvlaki', name:'Pork souvlaki + Greek salad', emo:'🍢', mins:35, protein:true, h:1, s:['summer','spring'], tags:['medi','quick'],
+ pun:'A dinner with a point. Several points, actually.',
+ kid:'Slide his meat off the skewer (the stick is a hazard, the pork isn\'t). Cucumber, pita and tzatziki round his plate out.',
+ ing:[['Pork scotch or shoulder, cubed','600 g','M'],['Lemon','2','V'],['Dried oregano','1 tbsp','P'],['Garlic','3 cloves','V'],['Cucumber','1','V'],['Tomatoes','3','V'],['Red onion','½','V'],['Feta','150 g','D'],['Kalamata olives','½ cup','P'],['Pita bread','4','B'],['Greek yoghurt','1 cup','D'],['Skewers','8','P']],
+ steps:['Marinate pork: lemon juice, oregano, garlic, olive oil — 15 min minimum.','Thread skewers. Grill or pan-sear over high heat, turning, 10–12 min.','Greek salad: chunked tomato, cucumber, onion, olives, feta slab, oregano, oil.','Quick tzatziki with the yoghurt, grated cucumber, garlic.','Warm pitas; build or plate — skewers over salad, tzatziki everywhere.']},
+
+{id:'tunabake', name:'Tuna pasta bake', emo:'🐟', mins:45, protein:true, h:1, tags:['pasta','batch'],
+ pun:'Tuna in tomorrow — the leftovers are even better.',
+ kid:'Soft pasta, mild fish, hidden corn and peas — an easy toddler night. His serve minus the crispy top if it\'s too chewy.',
+ ing:[['Tinned tuna in springwater','2 × 185 g','P'],['Short pasta','350 g','P'],['Frozen peas + corn','1½ cups','F'],['Butter + flour','50 g / ⅓ cup','P'],['Milk','600 ml','D'],['Tasty cheese','1½ cups','D'],['Onion','1','V'],['Breadcrumbs','⅓ cup','P'],['Lemon','1','V']],
+ steps:['Boil pasta 2 min under; drain.','White sauce: soften diced onion in butter, flour in 1 min, whisk in milk until thick. Half the cheese in.','Fold pasta, drained tuna, peas and corn through the sauce; lemon zest lifts it.','Top with remaining cheese + breadcrumbs.','Bake 200 °C, 15–18 min until bubbling and bronzed.']},
+
+{id:'stuffedcaps', name:'Polneti piperki (stuffed capsicums)', emo:'🫑', mins:75, protein:true, h:1, s:['summer','autumn'], tags:['balkan','batch'],
+ pun:'Stuffed if I know a better dinner.',
+ kid:'The soft rice-mince filling is ideal for him — spoon it out of the capsicum shell, which can be too chewy at this age.',
+ ing:[['Beef + pork mince (mixed)','500 g','M'],['Red capsicums','6','V'],['Rice','¾ cup','P'],['Onion','1','V'],['Garlic','2 cloves','V'],['Sweet paprika','1 tbsp','P'],['Crushed tomatoes','400 g tin','P'],['Parsley','½ bunch','V'],['Greek yoghurt','to serve','D']],
+ steps:['Soften diced onion and garlic; stir in paprika, mince (brown lightly) and raw rice.','Deseed capsicums through the top; stuff loosely — rice swells.','Stand them in a deep dish; tomatoes + a cup of water around.','Cover; bake 190 °C for 50–60 min until rice is tender.','Serve with the pan tomato sauce and a spoon of yoghurt. Very Baba-approved.']},
+
+{id:'stroganoff', name:'Beef stroganoff', emo:'🍄', mins:40, protein:true, f:1, s:['winter','autumn'], tags:['pasta','batch'],
+ pun:'Rough day? Strog it off.',
+ kid:'Creamy, mild, soft — chop his beef fine and it\'s a winner. Mushrooms are hit or miss; quarter his small.',
+ ing:[['Beef strips (rump or scotch)','600 g','M'],['Mushrooms','400 g','V'],['Onion','1','V'],['Garlic','2 cloves','V'],['Smoked paprika','2 tsp','P'],['Beef stock','1 cup','P'],['Sour cream','300 ml','D'],['Dijon mustard','1 tbsp','P'],['Fettuccine or mash potatoes','400 g / 800 g','P'],['Parsley','½ bunch','V']],
+ steps:['Sear beef in batches in a very hot pan; remove.','Brown sliced mushrooms properly, then onion and garlic, 5 min.','Paprika in; stock in, scraping the pan. Simmer 5 min.','Off the boil: sour cream, mustard, beef back in. Warm gently — don\'t split it.','Over fettuccine or mash, parsley on top.']},
+
+{id:'caesarwraps', name:'Chicken Caesar wraps', emo:'🌯', mins:20, protein:true, h:1, s:['summer','spring'], tags:['quick'],
+ pun:'Et tu, croutons?',
+ kid:'A deconstructed plate for him: chicken strips, cucumber, soft tortilla pieces, a little cheese. Dressing on the side.',
+ ing:[['Chicken breast','400 g','M'],['Large tortillas','4','P'],['Cos lettuce','1','V'],['Bacon','3 rashers','M'],['Parmesan','½ cup','D'],['Caesar dressing','⅓ cup','P'],['Cucumber (for the little one)','1','V'],['Lemon','½','V']],
+ steps:['Pan-fry seasoned chicken 5–6 min a side; rest and slice. Crisp the bacon alongside.','Chop cos; crumble bacon.','Toss lettuce, chicken, bacon, parmesan with dressing and a squeeze of lemon.','Load and roll the tortillas tight, ends tucked.','Halve on the diagonal because presentation matters, even on a Tuesday.']},
+
+{id:'salmontray', name:'Honey mustard salmon traybake', emo:'🐠', mins:30, protein:true, h:1, tags:['onepan','quick','lowcarb'],
+ pun:'Some salmon-chanted evening…',
+ kid:'Salmon is brilliant toddler brain food — flake his portion carefully for pin bones and keep the glaze light.',
+ ing:[['Salmon fillets','3','M'],['Honey','2 tbsp','P'],['Wholegrain mustard','1 tbsp','P'],['Baby potatoes','600 g','V'],['Broccolini','1 bunch','V'],['Lemon','1','V'],['Garlic','2 cloves','V'],['Olive oil','2 tbsp','P']],
+ steps:['Oven 200 °C. Halved potatoes with oil and garlic on the tray; roast 20 min head start.','Whisk honey, mustard, lemon juice.','Nudge potatoes over; salmon and broccolini in, glaze brushed on the fish.','Roast 12–14 min until salmon just flakes.','Lemon over the tray; serve from it.']},
+
+{id:'minestrone', name:'Minestrone + parmesan toast', emo:'🍲', mins:40, protein:false, h:1, s:['winter','autumn'], tags:['soup','veg','batch'],
+ pun:'This one comes minestrone-gly recommended.',
+ kid:'Small soft pasta, soft veg, mild broth — spoon practice heaven. Cool it well; minestrone holds heat like a grudge.',
+ ing:[['Bacon or pancetta (optional)','150 g','M'],['Small pasta (risoni or macaroni)','¾ cup','P'],['Borlotti or cannellini beans','400 g tin','P'],['Crushed tomatoes','400 g tin','P'],['Carrot + celery + onion','2 / 2 / 1','V'],['Zucchini','1','V'],['Garlic','3 cloves','V'],['Veg or chicken stock','1.25 L','P'],['Parmesan','½ cup','D'],['Sourdough','4 slices','B']],
+ steps:['Render bacon (if using); soften diced onion, carrot, celery, garlic, 6 min.','Tomatoes, stock, beans in; simmer 15 min.','Pasta and diced zucchini in; simmer until pasta is just done, ~10 min.','Grill sourdough with olive oil and parmesan until golden.','Season the pot, parmesan over each bowl, toast for dunking.']},
+
+{id:'parmy', name:'Chicken parmigiana', emo:'🍅', mins:45, protein:true, f:1, tags:['airfryer'],
+ pun:'Parma-nently on the Friday menu.',
+ side:'Swap the bagged leaves for a proper garden salad with a sharp vinaigrette in summer.',
+ kid:'Cut his into soft strips before the cheese fully sets — the crumb goes chewy as it cools. A pub classic he\'ll grow into.',
+ ing:[['Chicken breast','2 large','M'],['Panko breadcrumbs','1½ cups','P'],['Eggs','2','D'],['Plain flour','½ cup','P'],['Passata or pizza sauce','1 cup','P'],['Ham (optional, for the purists)','4 slices','M'],['Mozzarella','1½ cups','D'],['Potatoes (chips)','4','V'],['Salad leaves','1 bag','V']],
+ steps:['Chips on first: air fry 200 °C, 20–22 min.','Butterfly, flatten and crumb the chicken (flour → egg → panko).','Air fry schnitzels 195 °C, 12 min until golden.','Top with sauce, ham, mozzarella; back in until molten, 3–4 min (or grill).','Chips, salad, and the eternal debate: chips under the parmy or beside it.']},
+
+{id:'prawnspag', name:'Garlic prawn spaghetti', emo:'🦐', mins:25, protein:true, h:1, s:['summer','spring'], tags:['pasta','quick'],
+ pun:'Prawn to be wild.',
+ kid:'Chop his prawns small (they\'re chewy little things) and keep chilli well away from his portion.',
+ ing:[['Raw prawns, peeled','500 g','M'],['Spaghetti','350 g','P'],['Garlic','5 cloves','V'],['Cherry tomatoes','1 punnet','V'],['Chilli flakes (adults)','½ tsp','P'],['Lemon','1','V'],['Butter','50 g','D'],['Parsley','½ bunch','V'],['Olive oil','⅓ cup','P']],
+ steps:['Spaghetti into well-salted water; reserve a mug of pasta water.','Blister halved tomatoes in olive oil; add sliced garlic 1 min.','Prawns in, 2 min a side until just pink. Butter and lemon juice in.','Toss pasta through with splashes of pasta water until glossy.','Parsley, lemon zest; chilli flakes over the grown-up bowls.']},
+
+{id:'pitapizza', name:'Pita pizzas', emo:'🍕', mins:20, protein:true, f:1, tags:['quick'],
+ pun:'A pizza my heart belongs to Friday.',
+ kid:'He builds his own — that\'s the dinner AND the activity. Mild toppings, cut into little wedges.',
+ ing:[['Pita bread','4','B'],['Passata or pizza sauce','1 cup','P'],['Mozzarella','2 cups','D'],['Ham or shredded chicken','200 g','M'],['Capsicum','1','V'],['Mushrooms','4','V'],['Pineapple (household politics permitting)','½ tin','P'],['Olives','⅓ cup','P'],['Oregano','1 tsp','P']],
+ steps:['Oven 220 °C with trays heating inside.','Sauce each pita thin — soggy middles are a rookie error.','Cheese, then toppings, everyone assembling their own.','Onto the hot trays; 8–10 min until the edges snap.','Oregano over. Fold, bite, repeat.']},
+
+/* ---------- EXPLORE POOL — palate-adjacent ---------- */
+{id:'padkrapow', name:'Pad krapow (Thai basil beef)', emo:'🌿', explore:true, mins:20, protein:true, h:1, tags:['thai','quick'],
+ pun:'Basil-ly the best thing you\'ll cook all week.',
+ why:'You love Thai and cook a lot of mince — this is Thailand\'s weeknight answer to spag bol. Faster than delivery.',
+ kid:'Serious chilli territory. Cook a plain mince + rice + fried-egg portion for him before adding chilli and extra sauce.',
+ ing:[['Beef or pork mince','500 g','M'],['Thai basil (or regular basil)','1 big bunch','V'],['Garlic','4 cloves','V'],['Birdseye chillies','2–3','V'],['Oyster sauce','2 tbsp','P'],['Soy + fish sauce','1 tbsp each','P'],['Brown sugar','1 tsp','P'],['Jasmine rice','1½ cups','P'],['Eggs (for frying)','2','D']],
+ steps:['Cook rice. Pound or mince garlic and chilli together.','Screaming-hot wok: garlic-chilli 20 sec, then mince, pressing flat to crisp, 5 min.','Sauce in: oyster, soy, fish sauce, sugar, splash of water. Toss 1 min.','Kill the heat; fold through a full bunch of basil until just wilted.','Crispy fried egg on each bowl — runny yolk is the sauce.']},
+
+{id:'pljeskavica', name:'Pljeskavica (Balkan smash burger)', emo:'🍔', explore:true, mins:30, protein:true, f:1, tags:['balkan','quick'],
+ pun:'Big patty energy.',
+ why:'Where your Macedonian side meets your burger habit — a spiced, flat-grilled patty in warm flatbread with kajmak-style cheese.',
+ kid:'Mild by nature. A strip of patty, soft bread and cheese is a full toddler dinner.',
+ ing:[['Beef + pork mince (mixed)','600 g','M'],['Onion (grated)','1','V'],['Garlic','2 cloves','V'],['Sweet paprika','2 tsp','P'],['Bicarb soda','¼ tsp','P'],['Lepinja or Turkish bread','2','B'],['Cream cheese or feta whipped with butter (cheat kajmak)','150 g','D'],['Ajvar','½ jar','P'],['Tomato + onion (to serve)','—','V']],
+ steps:['Knead mince with grated onion, garlic, paprika, bicarb and a splash of soda water; rest 20 min (overnight is better).','Form two huge thin patties, plate-wide.','Grill or pan-sear over high heat 3–4 min a side.','Warm and split the bread; smear with cheat-kajmak and ajvar.','Patty in, tomato and onion over. Fold and commit.']},
+
+{id:'shakshuka', name:'Shakshuka with pita', emo:'🍳', explore:true, mins:30, protein:true, h:1, tags:['medi','onepan','veg'],
+ pun:'An egg-cellent decision, if we do say so.',
+ why:'Your mezze/Mediterranean lane, for nights the meat isn\'t defrosted — eggs poached in spiced tomato, hummus and pita on the side.',
+ kid:'Well-cooked egg in mild tomato is great for him — set his yolk fully and hold the chilli.',
+ ing:[['Eggs','6','D'],['Crushed tomatoes','2 × 400 g tins','P'],['Red capsicum','1','V'],['Onion','1','V'],['Garlic','3 cloves','V'],['Cumin + smoked paprika','1 tsp each','P'],['Feta','100 g','D'],['Pita bread','4','B'],['Hummus','1 tub','P'],['Parsley or coriander','½ bunch','V']],
+ steps:['Soften sliced onion and capsicum in olive oil, 6 min; garlic and spices 1 min.','Tomatoes in; simmer 10 min until thick enough to hold a spoon-trail.','Make wells; crack in eggs. Lid on, 5–7 min to your yolk liking.','Feta and herbs over the pan.','Warm pitas, hummus on the table, scoop straight from the pan.']},
+
+{id:'koreanbeef', name:'Korean beef bowls', emo:'🍚', explore:true, mins:20, protein:true, h:1, tags:['quick','rice','bowls'],
+ pun:'Seoul food, delivered in twenty.',
+ why:'Same speed as tacos, new flavour axis — sweet-savoury gochujang beef over rice. Your fried-rice nights say you\'ll be into it.',
+ kid:'Set aside plain mince + rice + cucumber for him before the gochujang goes in.',
+ ing:[['Beef mince','500 g','M'],['Gochujang','1–2 tbsp','P'],['Soy sauce','2 tbsp','P'],['Brown sugar','1 tbsp','P'],['Garlic + ginger','3 cloves / thumb','V'],['Sesame oil','2 tsp','P'],['Rice','1½ cups','P'],['Cucumber','1','V'],['Spring onions + sesame seeds','to serve','V'],['Eggs (optional fried)','2','D']],
+ steps:['Cook rice. Whisk gochujang, soy, sugar, splash of water.','Brown mince hard; garlic and ginger the last minute.','Sauce in; bubble 2 min until glossy.','Quick cucumber: slice thin, pinch of salt, splash of rice vinegar if you have it.','Bowls: rice, beef, cucumber, spring onion, sesame. Fried egg if you\'re feeling it.']},
+
+{id:'katsu', name:'Chicken katsu curry', emo:'🍛', explore:true, mins:40, protein:true, f:1, tags:['curry','airfryer'],
+ pun:'You katsu-lly can\'t go wrong here.',
+ why:'You do butter chicken and crumbed fish — katsu is the midpoint: crunchy panko chicken over rice with a mild golden curry sauce.',
+ kid:'Katsu sauce is naturally mild and sweet — his portion works as-is, cut small.',
+ ing:[['Chicken breast','2 large','M'],['Panko breadcrumbs','1½ cups','P'],['Eggs','2','D'],['Plain flour','½ cup','P'],['Japanese curry roux block (mild)','½ pack','P'],['Onion','1','V'],['Carrot','2','V'],['Potato','1','V'],['Rice','1½ cups','P']],
+ steps:['Sauce: soften onion, carrot, potato; 2 cups water, simmer 10 min, melt in roux until thick.','Butterfly and flatten chicken; flour → egg → panko.','Air fry 195 °C 12–14 min with oil spray (or shallow-fry) until deep gold.','Cook rice.','Katsu in strips over rice; sauce over one side to keep the crunch.']},
+
+{id:'fishtacos', name:'Baja fish tacos', emo:'🌮', explore:true, mins:30, protein:true, h:1, s:['summer','spring'], tags:['texmex','quick'],
+ pun:'Holy mackerel, it\'s taco night.',
+ why:'Your taco night and your fish night were always going to meet. Crumbed fish, lime slaw, warm tortillas.',
+ kid:'Flaked plain fish, avocado and soft tortilla for him — slaw on the side, dressing off.',
+ ing:[['White fish fillets','400 g','M'],['Small tortillas','8','P'],['Panko breadcrumbs','1 cup','P'],['Egg','1','D'],['Red cabbage','¼','V'],['Lime','2','V'],['Mayonnaise','⅓ cup','P'],['Coriander','½ bunch','V'],['Avocado','1','V'],['Sriracha (adults)','to taste','P']],
+ steps:['Slaw: shred cabbage; dress with mayo, lime juice, coriander.','Crumb fish strips (egg → panko); air fry 195 °C ~10 min or pan-fry until golden.','Warm tortillas in a dry pan.','Build: slaw, fish, avocado, extra lime. Sriracha-mayo for the adults.','Eat over a plate. No dignity in fish tacos.']},
+
+{id:'pastitsio', name:'Pastitsio (Greek lasagne)', emo:'🫕', explore:true, mins:90, protein:true, f:1, s:['winter','autumn'], tags:['medi','pasta','batch'],
+ pun:'It\'s all Greek to béchamel.',
+ why:'You make lasagne and love Greek food — pastitsio is the cinnamon-scented cousin with fat tubular pasta. Batch-cooks and freezes just as well.',
+ kid:'Soft pasta, mild beef, creamy top — toddler-approved. The cinnamon note usually goes down surprisingly well.',
+ ing:[['Beef mince','600 g','M'],['Thick tubular pasta (penne rigate works)','400 g','P'],['Crushed tomatoes','400 g tin','P'],['Onion','1','V'],['Cinnamon','½ tsp','P'],['Butter + flour','80 g / ½ cup','P'],['Milk','1 L','D'],['Eggs','2','D'],['Kefalograviera or parmesan','1 cup','D']],
+ steps:['Brown mince with onion; add tomatoes and cinnamon, simmer 20 min until dry-ish.','Boil pasta 2 min under; toss with a little béchamel.','Béchamel: butter, flour, milk, whisked thick; cool slightly, beat in eggs and most cheese.','Layer: pasta, mince, remaining béchamel deep on top; cheese over.','Bake 180 °C 40 min until golden. Rest 15 min — it needs it to slice.']},
+
+{id:'sanchoybau', name:'San choy bau', emo:'🥬', explore:true, mins:20, protein:true, h:1, tags:['quick','lowcarb'],
+ pun:'Lettuce eat.',
+ why:'Protein-heavy, 20 minutes, and hands-on at the table like your taco nights — savoury mince in lettuce cups.',
+ kid:'Skip the lettuce cup for him (slippery + chewy) — his mince goes over soft rice.',
+ ing:[['Pork or chicken mince','500 g','M'],['Iceberg lettuce','1','V'],['Water chestnuts (tinned), diced','1 tin','P'],['Garlic + ginger','3 cloves / thumb','V'],['Oyster sauce','2 tbsp','P'],['Soy sauce','1 tbsp','P'],['Sesame oil','1 tsp','P'],['Spring onions','3','V'],['Rice (for the little one + hungry adults)','1 cup','P']],
+ steps:['Separate lettuce into cups; ice-water bath makes them snappy.','Hot wok: garlic and ginger 30 sec, mince 5 min, pressing to get colour.','Water chestnuts, oyster, soy, sesame; toss 2 min.','Spring onions through.','Spoon into cups at the table.']},
+
+{id:'harissatray', name:'Harissa chicken traybake', emo:'🍗', explore:true, mins:60, protein:true, h:1, tags:['medi','onepan','roast'],
+ pun:'Harissa the roof — it\'s traybake night.',
+ why:'One tray, big flavour — North African heat next door to your Mediterranean staples. Yoghurt cools it down.',
+ kid:'Harissa has kick. Keep two thighs plain-oiled in a corner of the tray for him.',
+ ing:[['Chicken thighs, bone-in','6','M'],['Harissa paste','2 tbsp','P'],['Chickpeas','400 g tin','P'],['Red onion','2','V'],['Cherry tomatoes','1 punnet','V'],['Lemon','1','V'],['Greek yoghurt','1 cup','D'],['Couscous','1 cup','P'],['Coriander','½ bunch','V']],
+ steps:['Oven 200 °C. Rub chicken with harissa + oil (leave two plain).','Tray: drained chickpeas, wedged onion, tomatoes, lemon slices; chicken on top.','Roast 45–50 min until skin is burnished and chickpeas crisp at the edges.','Steep couscous 5 min; fluff.','Serve over couscous with yoghurt and coriander.']},
+
+{id:'larb', name:'Larb (Thai pork salad)', emo:'🥗', explore:true, mins:20, protein:true, h:1, s:['summer','spring'], tags:['thai','quick','lowcarb'],
+ pun:'Larb at first bite.',
+ why:'The Thai dish tourists come home craving — hot, sour, herby pork mince. Twenty minutes, mostly assembly.',
+ kid:'Too hot and sour as-is. Reserve plain cooked mince for him with rice and cucumber before dressing.',
+ ing:[['Pork or chicken mince','500 g','M'],['Lime','3','V'],['Fish sauce','2½ tbsp','P'],['Jasmine rice (2 tbsp toasted for powder + 1½ cups to steam)','—','P'],['Red shallots or red onion','2 / ½','V'],['Mint + coriander','1 bunch each','V'],['Chilli flakes','1–2 tsp','P'],['Cucumber','1','V']],
+ steps:['Toast 2 tbsp raw rice in a dry pan until golden; grind coarse. Steam the rest.','Cook mince with a splash of water, breaking fine, until just done — don\'t brown it.','Off heat: lime juice, fish sauce, chilli, sliced shallots.','Fold through a genuinely large amount of mint and coriander, plus the rice powder.','Serve warm with rice and cucumber. Adjust lime/fish sauce until it bites.']},
+
+{id:'banhmibowl', name:'Bánh mì bowls', emo:'🍜', explore:true, mins:30, protein:true, h:1, tags:['bowls','quick'],
+ pun:'Bánh mì up, Scotty.',
+ why:'All the bánh mì hits — caramelised pork, pickled veg, herbs — over rice instead of a baguette. Fresh, fast, protein-forward.',
+ kid:'Plain pork + rice + soft cucumber for him; pickles are usually a hit if rinsed of vinegar.',
+ ing:[['Pork mince','500 g','M'],['Carrot','2','V'],['Cucumber','1','V'],['Rice vinegar + sugar (quick pickle)','⅓ cup / 2 tbsp','P'],['Garlic','3 cloves','V'],['Fish sauce','1½ tbsp','P'],['Brown sugar','1½ tbsp','P'],['Rice','1½ cups','P'],['Coriander + mint','½ bunch each','V'],['Mayonnaise + sriracha','to serve','P']],
+ steps:['Quick-pickle ribboned carrot and cucumber in vinegar + sugar + pinch of salt.','Cook rice.','Caramelise mince with garlic, fish sauce and sugar until sticky at the edges, 8 min.','Whisk sriracha into mayo.','Bowls: rice, pork, drained pickles, herbs, spicy mayo zigzag.']},
+
+{id:'karaage', name:'Air fryer chicken karaage', emo:'🍗', explore:true, mins:35, protein:true, f:1, tags:['airfryer','quick'],
+ pun:'Have the karaage to try something new.',
+ why:'Your air fryer\'s next trick — Japanese fried chicken, soy-ginger marinated, potato-starch crisp, without the oil bath.',
+ kid:'Mild and shreddable inside. Cut his pieces small and cool; the coating is gentle.',
+ ing:[['Chicken thigh fillets','700 g','M'],['Soy sauce','2 tbsp','P'],['Ginger + garlic (grated)','thumb / 2 cloves','V'],['Potato starch or cornflour','¾ cup','P'],['Rice','1½ cups','P'],['Cucumber','1','V'],['Kewpie mayo','to serve','P'],['Lemon','1','V'],['Sesame seeds','1 tsp','P']],
+ steps:['Marinate chunked thighs in soy, ginger, garlic — 15 min minimum.','Cook rice; slice cucumber.','Toss chicken in starch until every piece is dusty-dry.','Air fry 195 °C, 14–16 min, oil-sprayed, shaking twice, until craggy and golden.','Rice, cucumber, karaage, mayo, lemon, sesame. Gone in minutes.']}
+,
+
+/* ---------- EXPANSION · Asia ---------- */
+{id:'massaman', name:'Beef massaman curry', emo:'🥘', mins:150, protein:true, h:1, s:['winter','autumn'], tags:['thai','curry','batch'],
+ pun:'Massaman, oh man, that\'s good.',
+ kid:'The mildest Thai curry there is — soft slow-cooked beef and potato mash together beautifully for him. Peanuts crushed fine or off his bowl.',
+ ing:[['Chuck or gravy beef, chunked','800 g','M'],['Massaman curry paste','3 tbsp','P'],['Coconut milk','2 × 400 ml tins','P'],['Potatoes','500 g','V'],['Onion','1','V'],['Roasted peanuts','⅓ cup','P'],['Fish sauce + brown sugar','1 tbsp each','P'],['Cinnamon stick + star anise','1 each','P'],['Jasmine rice','1½ cups','P']],
+ steps:['Fry paste in coconut cream 2 min; brown beef in it.','Coconut milk, spices, fish sauce and sugar in; simmer lidded 1.5–2 hrs until beef gives up.','Potatoes and wedged onion in for the last 30 min.','Cook rice; crush peanuts.','Bowls, peanuts over the adult ones.']},
+
+{id:'tomkha', name:'Tom kha gai (coconut chicken soup)', emo:'🥥', mins:30, protein:true, h:1, s:['winter'], tags:['thai','soup','quick'],
+ pun:'Tom kha-n\'t stop, won\'t stop.',
+ kid:'Strain his bowl of the aromatics (galangal, lemongrass chunks aren\'t for eating) and keep chilli out — the coconut broth itself is gentle.',
+ ing:[['Chicken thigh fillets','500 g','M'],['Coconut milk','2 × 400 ml tins','P'],['Chicken stock','2 cups','P'],['Lemongrass','2 stalks','V'],['Galangal or ginger','thumb','V'],['Mushrooms','200 g','V'],['Lime','2','V'],['Fish sauce','2 tbsp','P'],['Coriander','½ bunch','V'],['Jasmine rice','1 cup','P']],
+ steps:['Simmer stock with bruised lemongrass and sliced galangal 5 min.','Coconut milk in; sliced chicken poached gently 8 min.','Mushrooms in for 3 min.','Off heat: fish sauce and plenty of lime juice.','Coriander over; rice on the side or in the bowl.']},
+
+{id:'satay', name:'Chicken satay skewers + rice', emo:'🍢', mins:35, protein:true, h:1, tags:['thai','quick'],
+ pun:'You satay right there — dinner\'s coming.',
+ kid:'Smooth peanut sauce (thinned) is fine at 21 months; whole peanuts are not. Meat off the skewer, always.',
+ ing:[['Chicken thigh fillets','600 g','M'],['Peanut butter (smooth)','½ cup','P'],['Coconut milk','400 ml tin','P'],['Soy sauce','2 tbsp','P'],['Red curry paste','1 tbsp','P'],['Brown sugar','1 tbsp','P'],['Lime','1','V'],['Cucumber','1','V'],['Jasmine rice','1½ cups','P'],['Skewers','8','P']],
+ steps:['Marinate chicken strips in soy + a spoon of the coconut milk; thread skewers.','Satay sauce: simmer curry paste, peanut butter, remaining coconut milk, sugar, splash of soy until thick; lime in.','Grill or pan-sear skewers 8–10 min, turning.','Cook rice; slice cucumber.','Sauce over, extra for dunking.']},
+
+{id:'padseeew', name:'Pad see ew', emo:'🍜', mins:25, protein:true, h:1, tags:['thai','quick'],
+ pun:'Pad see ew? Pad see YUM.',
+ kid:'Soft wide noodles and egg are toddler-perfect — cut his noodles short and keep the dark soy light on his portion.',
+ ing:[['Chicken thigh or beef strips','500 g','M'],['Fresh wide rice noodles','450 g','P'],['Chinese broccoli (gai lan) or broccolini','1 bunch','V'],['Eggs','2','D'],['Dark soy sauce','1½ tbsp','P'],['Oyster sauce','2 tbsp','P'],['Garlic','3 cloves','V'],['White pepper','pinch','P']],
+ steps:['Separate noodles gently (30 sec microwave helps).','Screaming-hot wok: garlic, then meat until just cooked; push aside.','Scramble eggs in the gap.','Noodles + sauces in; let them sit to char slightly before each toss.','Greens in for the final 2 min; white pepper over.']},
+
+{id:'phoga', name:'Chicken pho', emo:'🍲', mins:45, protein:true, h:1, s:['winter','autumn'], tags:['soup'],
+ pun:'Pho real, it\'s soup night.',
+ kid:'Noodle soup is a toddler event. Cut his noodles, cool his broth, herbs are optional chaos.',
+ ing:[['Chicken breast or thigh','500 g','M'],['Chicken stock','1.5 L','P'],['Rice noodles (banh pho)','300 g','P'],['Onion','1','V'],['Ginger','big thumb','V'],['Star anise + cinnamon stick','2 / 1','P'],['Fish sauce','2 tbsp','P'],['Bean sprouts','1 cup','V'],['Thai basil + coriander','½ bunch each','V'],['Lime','1','V']],
+ steps:['Char halved onion and ginger in a dry pan until blackened at the edges.','Simmer stock with the charred aromatics, star anise, cinnamon, 20 min; poach chicken in it the last 10.','Strain broth; season with fish sauce. Slice chicken.','Soak noodles per packet.','Bowls: noodles, chicken, hot broth over; herbs, sprouts, lime at the table.']},
+
+{id:'lemongrasschicken', name:'Lemongrass chicken rice bowls', emo:'🍋', mins:30, protein:true, h:1, tags:['quick','bowls'],
+ pun:'The lemongrass is always greener on this side.',
+ kid:'Caramelised but mild — chop his chicken small with rice and cucumber. A gateway to bigger flavours.',
+ ing:[['Chicken thigh fillets','600 g','M'],['Lemongrass (finely minced)','2 stalks','V'],['Garlic','3 cloves','V'],['Fish sauce','2 tbsp','P'],['Brown sugar','1½ tbsp','P'],['Rice','1½ cups','P'],['Cucumber','1','V'],['Carrot','1','V'],['Mint + coriander','½ bunch each','V'],['Lime','1','V']],
+ steps:['Marinate sliced chicken: lemongrass, garlic, fish sauce, sugar — 15 min.','Cook rice; ribbon the cucumber and carrot.','Pan-sear chicken hot until caramelised at the edges, 8–10 min.','Bowls: rice, chicken, fresh veg, herbs.','Lime over everything.']},
+
+{id:'bulgogi', name:'Beef bulgogi', emo:'🥩', mins:30, protein:true, h:1, tags:['quick','rice'],
+ pun:'Bulgogi? More like bul-GO-get seconds.',
+ kid:'Sweet-savoury thin beef is easy chewing — rinse a little sauce off his and pair with rice and cucumber.',
+ ing:[['Beef scotch or rump, sliced paper thin','600 g','M'],['Soy sauce','3 tbsp','P'],['Brown sugar','1½ tbsp','P'],['Nashi pear or apple (grated)','½','V'],['Garlic + ginger','3 cloves / thumb','V'],['Sesame oil','1 tbsp','P'],['Rice','1½ cups','P'],['Spring onions','3','V'],['Sesame seeds','1 tsp','P'],['Cucumber','1','V']],
+ steps:['Marinate beef: soy, sugar, grated pear, garlic, ginger, sesame oil — 20 min (the pear tenderises).','Cook rice.','Sear beef in a ripping-hot pan in two batches, 2 min each.','Spring onions through at the end.','Over rice with cucumber; sesame seeds to finish.']},
+
+{id:'teriyaki', name:'Chicken teriyaki bowls', emo:'🍱', mins:25, protein:true, h:1, tags:['quick','rice','bowls'],
+ pun:'Okey teriyaki.',
+ kid:'Glossy, mild, sweet — his portion needs no changes beyond small pieces and a light hand with the glaze.',
+ ing:[['Chicken thigh fillets','600 g','M'],['Soy sauce','⅓ cup','P'],['Mirin','⅓ cup','P'],['Brown sugar','1 tbsp','P'],['Ginger','thumb','V'],['Rice','1½ cups','P'],['Broccoli','1 head','V'],['Edamame (frozen, podded)','1 cup','F'],['Sesame seeds','1 tsp','P']],
+ steps:['Simmer soy, mirin, sugar, grated ginger into a light syrup, 3 min.','Pan-sear chicken pieces until golden, 8 min.','Glaze in; bubble until the chicken is lacquered.','Rice on; steam broccoli and edamame.','Build bowls; sesame over.']},
+
+{id:'misosalmon', name:'Miso-glazed salmon + greens', emo:'🐟', mins:25, protein:true, h:1, tags:['quick','lowcarb'],
+ pun:'Miso happy right now.',
+ kid:'Salmon is brilliant toddler brain food. His piece glazed lightly, flaked, and checked twice for pin bones.',
+ ing:[['Salmon fillets','3','M'],['White miso paste','2 tbsp','P'],['Mirin','2 tbsp','P'],['Soy sauce','1 tbsp','P'],['Honey','1 tsp','P'],['Rice','1½ cups','P'],['Bok choy or broccolini','2 bunches','V'],['Ginger','thumb','V'],['Sesame seeds','1 tsp','P']],
+ steps:['Whisk miso, mirin, soy, honey.','Brush salmon; grill or air fry 190 °C, 8–10 min until caramelised at the edges.','Cook rice.','Steam or pan-toss greens with ginger.','Plate up; sesame over the fish.']},
+
+{id:'ramen', name:'Weeknight chicken ramen', emo:'🍜', mins:35, protein:true, h:1, s:['winter','autumn'], tags:['soup'],
+ pun:'Ramen-ber to slurp.',
+ kid:'Noodles cut short, broth cooled, egg fully set for him — then stand back and accept the mess.',
+ ing:[['Chicken thigh fillets','500 g','M'],['Ramen noodles','3 portions','P'],['Chicken stock','1.5 L','P'],['Miso paste','2 tbsp','P'],['Soy sauce','1 tbsp','P'],['Eggs','3','D'],['Corn kernels','1 cup','F'],['Spring onions','3','V'],['Garlic + ginger','3 cloves / thumb','V'],['Sesame oil','1 tsp','P']],
+ steps:['Simmer stock with garlic and ginger 10 min; whisk in miso and soy.','Pan-sear chicken; rest and slice.','Soft-boil eggs 6½ min (his goes 9); halve.','Cook noodles separately; never in the broth.','Bowls: noodles, broth, chicken, corn, egg, spring onion, drops of sesame oil.']},
+
+{id:'honeyprawns', name:'Honey garlic prawn stir-fry', emo:'🦐', mins:20, protein:true, h:1, tags:['quick','rice'],
+ pun:'Oh honey, honey — it\'s prawn night.',
+ kid:'Chop his prawns small (chewy little things) and serve over rice with the veg — the sauce is naturally mild.',
+ ing:[['Raw prawns, peeled','500 g','M'],['Honey','2 tbsp','P'],['Soy sauce','2 tbsp','P'],['Garlic','4 cloves','V'],['Snow peas','150 g','V'],['Red capsicum','1','V'],['Cornflour','1 tsp','P'],['Rice','1½ cups','P'],['Sesame seeds','1 tsp','P']],
+ steps:['Cook rice. Whisk honey, soy, cornflour, splash of water.','Hot wok: prawns 2 min until just pink; remove.','Stir-fry capsicum and snow peas 2 min; garlic 30 sec.','Prawns back with the sauce; bubble 1 min until glossy.','Over rice, sesame on top.']},
+
+{id:'squid', name:'Air fryer salt & pepper squid', emo:'🦑', mins:30, protein:true, f:1, tags:['airfryer','quick'],
+ pun:'Squid pro quo: you cook, you feast.',
+ kid:'Squid is a chewing challenge at 21 months — give him the rice, cucumber and a little flaked fish or plain chicken instead.',
+ ing:[['Squid tubes, scored + sliced','600 g','M'],['Cornflour','¾ cup','P'],['White pepper + Sichuan pepper (or black)','1 tsp each','P'],['Salt flakes','1 tsp','P'],['Garlic','3 cloves','V'],['Long red chilli (adults)','1','V'],['Spring onions','3','V'],['Rice','1½ cups','P'],['Lemon','1','V'],['Kewpie mayo','to serve','P']],
+ steps:['Pat squid very dry; toss in cornflour + peppers until dusty.','Air fry 200 °C, 7–9 min with oil spray — no longer, or it turns to rubber bands.','Flash-fry sliced garlic, chilli, spring onion in a little oil.','Toss squid through with the salt flakes.','Rice, lemon, mayo. Eat immediately — squid waits for no one.']},
+
+{id:'fishcurry', name:'Coconut fish curry', emo:'🐠', mins:30, protein:true, h:1, tags:['curry','quick'],
+ pun:'Any fin is possible in a curry.',
+ kid:'A mild yellow coconut curry is great for him — flake his fish carefully and serve over well-sauced rice.',
+ ing:[['Firm white fish, chunked','600 g','M'],['Coconut milk','400 ml tin','P'],['Mild yellow curry paste or korma paste','2 tbsp','P'],['Cherry tomatoes','1 punnet','V'],['Baby spinach','2 handfuls','V'],['Onion','1','V'],['Garlic + ginger','2 cloves / thumb','V'],['Lime','1','V'],['Basmati rice','1½ cups','P'],['Coriander','½ bunch','V']],
+ steps:['Soften onion; garlic, ginger and paste 1 min.','Coconut milk + tomatoes; simmer 8 min until tomatoes slump.','Fish in; poach gently 5–6 min — don\'t stir hard or it flakes apart.','Spinach wilted through; lime juice in.','Over basmati with coriander.']},
+
+{id:'sweetsourpork', name:'Sweet and sour pork', emo:'🍍', mins:35, protein:true, f:1, tags:['rice'],
+ pun:'A sweet and sour victory.',
+ kid:'Pineapple + soft pork + rice is a toddler jackpot. His pieces small; the sauce is naturally mild.',
+ ing:[['Pork scotch or fillet, chunked','600 g','M'],['Pineapple pieces (tinned, juice reserved)','440 g tin','P'],['Red + green capsicum','1 each','V'],['Onion','1','V'],['Tomato sauce','⅓ cup','P'],['White vinegar','2 tbsp','P'],['Brown sugar','2 tbsp','P'],['Cornflour','⅓ cup + 1 tsp','P'],['Rice','1½ cups','P'],['Egg','1','D']],
+ steps:['Toss pork in egg then cornflour; air fry 200 °C 12 min or pan-fry until golden.','Sauce: pineapple juice, tomato sauce, vinegar, sugar, 1 tsp cornflour — simmer until glossy.','Stir-fry capsicum and onion 3 min; pineapple in.','Pork and sauce through; toss 1 min.','Over rice, immediately, while the coating still crunches.']},
+
+{id:'frittata', name:'Bacon + veg frittata', emo:'🍳', mins:30, protein:true, h:1, tags:['quick','veg','onepan'],
+ pun:'Hakuna frittata.',
+ kid:'Egg wedge + hidden veg = the easiest toddler dinner in the book. Serve his just-warm.',
+ ing:[['Eggs','8','D'],['Bacon','3 rashers','M'],['Zucchini (grated)','1','V'],['Cherry tomatoes','1 punnet','V'],['Baby spinach','2 handfuls','V'],['Feta or tasty cheese','100 g','D'],['Spring onions','3','V'],['Crusty bread','to serve','B']],
+ steps:['Crisp chopped bacon in an ovenproof pan; spring onion and squeezed zucchini in for 2 min.','Whisk eggs; pour over, scatter spinach, halved tomatoes, cheese.','Low heat 5 min until the edges set.','Under the grill 5–7 min until puffed and golden.','Wedges with bread. Leftovers are tomorrow\'s lunch.']},
+
+{id:'fritters', name:'Corn + zucchini fritters', emo:'🌽', mins:30, protein:false, h:1, s:['summer','spring'], tags:['veg','quick'],
+ pun:'Don\'t fritter the evening away.',
+ side:'A simple tomato + cucumber salad rounds these out on a warm night.',
+ kid:'Handheld, soft, veg-smuggling — fritters were invented for toddlers. His plain with yoghurt instead of sweet chilli.',
+ ing:[['Zucchini (grated)','2','V'],['Corn kernels','2 cups','F'],['Eggs','3','D'],['Self-raising flour','¾ cup','P'],['Feta','100 g','D'],['Spring onions','3','V'],['Greek yoghurt','1 cup','D'],['Lemon','1','V'],['Sweet chilli (adults)','to serve','P'],['Bacon (optional protein boost)','4 rashers','M']],
+ steps:['Grate and ruthlessly squeeze the zucchini.','Mix with corn, eggs, flour, crumbled feta, spring onion.','Shallow-fry spoonfuls 2–3 min a side until golden. Crisp bacon alongside if using.','Lemon into the yoghurt for a quick sauce.','Stack, sauce, done.']},
+
+/* ---------- EXPANSION · Subcontinent, Middle East, Iberia ---------- */
+{id:'dahl', name:'Red lentil dahl + naan', emo:'🫛', mins:40, protein:true, h:1, s:['winter','autumn'], tags:['curry','veg','batch'],
+ pun:'It\'s dahl or nothing.',
+ kid:'Soft, mild, iron-rich — dahl is toddler superfood. His bowl with yoghurt swirled through and naan for scooping.',
+ ing:[['Red lentils','1½ cups','P'],['Coconut milk','400 ml tin','P'],['Crushed tomatoes','400 g tin','P'],['Onion','1','V'],['Garlic + ginger','3 cloves / thumb','V'],['Curry powder + turmeric + cumin','2 tsp / 1 tsp / 1 tsp','P'],['Baby spinach','2 handfuls','V'],['Naan bread','4','B'],['Greek yoghurt','½ cup','D'],['Coriander','½ bunch','V']],
+ steps:['Soften onion; garlic, ginger, spices 1 min.','Rinsed lentils, tomatoes, coconut milk + 2 cups water; simmer 25 min, stirring now and then.','Spinach wilted through; season.','Warm naan.','Yoghurt and coriander over. Costs about $4 a head and eats like a hug.']},
+
+{id:'chickpeacurry', name:'Chickpea + spinach curry', emo:'🥘', mins:30, protein:true, h:1, tags:['curry','veg','quick'],
+ pun:'Chick-peas and thank you.',
+ kid:'Chickpeas lightly mashed into the sauce are perfect finger-and-spoon food. Keep his mild; it already is.',
+ ing:[['Chickpeas','2 × 400 g tins','P'],['Coconut milk','400 ml tin','P'],['Crushed tomatoes','400 g tin','P'],['Onion','1','V'],['Garlic + ginger','3 cloves / thumb','V'],['Garam masala + turmeric','2 tsp / 1 tsp','P'],['Baby spinach','3 handfuls','V'],['Basmati rice','1½ cups','P'],['Greek yoghurt','½ cup','D']],
+ steps:['Soften onion; garlic, ginger, spices 1 min.','Tomatoes and drained chickpeas; simmer 10 min.','Coconut milk in; 5 min more until rich.','Spinach through; cook rice meanwhile.','Yoghurt on top. Meat won\'t be missed.']},
+
+{id:'tandoori', name:'Tandoori chicken + rice', emo:'🍗', mins:45, protein:true, h:1, tags:['curry','airfryer'],
+ pun:'Tan-doori you glad it\'s dinner?',
+ kid:'Tandoori paste is aromatic, not hot — but yoghurt-marinate two plain thighs for him anyway if the jar runs spicy.',
+ ing:[['Chicken thighs','700 g','M'],['Tandoori paste','3 tbsp','P'],['Greek yoghurt','1 cup','D'],['Basmati rice','1½ cups','P'],['Cucumber','1','V'],['Tomato','2','V'],['Red onion','½','V'],['Lemon','1','V'],['Coriander','½ bunch','V'],['Naan (optional)','2','B']],
+ steps:['Marinate chicken in tandoori paste + half the yoghurt — 20 min to overnight.','Air fry 190 °C 18–20 min (or bake 200 °C 25) until charred at the edges.','Cook rice; chop a quick kachumber salad (cucumber, tomato, onion, lemon).','Remaining yoghurt with a squeeze of lemon as raita.','Pile it up; coriander over.']},
+
+{id:'madras', name:'Slow beef madras', emo:'🍛', mins:150, protein:true, f:1, s:['winter','autumn'], tags:['curry','batch'],
+ pun:'No rush — it\'s a madras, not a race.',
+ kid:'Genuine heat. Pull his beef and potato out before the extra chilli, or give him rice + yoghurt + plain beef from the pot\'s mild base.',
+ ing:[['Chuck steak, chunked','900 g','M'],['Madras curry paste','4 tbsp','P'],['Crushed tomatoes','400 g tin','P'],['Onion','2','V'],['Garlic + ginger','4 cloves / thumb','V'],['Beef stock','1 cup','P'],['Potatoes','400 g','V'],['Basmati rice','1½ cups','P'],['Greek yoghurt','½ cup','D'],['Coriander','½ bunch','V']],
+ steps:['Brown beef hard in batches.','Soften onion; garlic, ginger, paste 2 min.','Beef back with tomatoes and stock; lid on, oven 160 °C, 2 hrs.','Potatoes in for the last 40 min; lid off to thicken.','Rice, yoghurt, coriander. Better tomorrow, if it survives.']},
+
+{id:'keema', name:'Keema peas (spiced mince)', emo:'🫛', mins:30, protein:true, h:1, tags:['curry','quick'],
+ pun:'Keema calm and curry on.',
+ kid:'Mild mince and peas over rice — practically designed for little hands and spoons. Skip the chilli, obviously.',
+ ing:[['Beef or chicken mince','500 g','M'],['Frozen peas','1½ cups','F'],['Onion','1','V'],['Garlic + ginger','3 cloves / thumb','V'],['Garam masala + turmeric + cumin','2 tsp / ½ tsp / 1 tsp','P'],['Crushed tomatoes','400 g tin','P'],['Basmati rice','1½ cups','P'],['Greek yoghurt','½ cup','D'],['Coriander','½ bunch','V']],
+ steps:['Soften onion; garlic, ginger, spices 1 min.','Mince in; brown well, 6 min.','Tomatoes + splash of water; simmer 10 min.','Peas for the last 3.','Over rice with yoghurt and coriander.']},
+
+{id:'kofta', name:'Beef kofta wraps', emo:'🌯', mins:30, protein:true, h:1, tags:['medi','quick'],
+ pun:'Kofta-n wonder what\'s for dinner? Not tonight.',
+ kid:'Kofta are just fancy meatballs — mild, soft, hand-sized. His deconstructed with pita bits, cucumber and yoghurt.',
+ ing:[['Beef mince','600 g','M'],['Onion (grated)','1','V'],['Garlic','2 cloves','V'],['Cumin + coriander + paprika','1 tsp each','P'],['Parsley','½ bunch','V'],['Pita or Lebanese bread','4','B'],['Hummus','1 tub','P'],['Greek yoghurt','1 cup','D'],['Tomato','2','V'],['Cucumber','1','V']],
+ steps:['Knead mince with grated onion, garlic, spices, chopped parsley.','Shape into 8 torpedoes around skewers (or free-form logs).','Grill or pan-sear over high heat, 10–12 min, turning.','Chop salad; garlic the yoghurt.','Warm bread, hummus down first, kofta, salad, yoghurt. Wrap and go.']},
+
+{id:'shawarma', name:'Chicken shawarma plates', emo:'🍗', mins:40, protein:true, h:1, tags:['medi','bowls'],
+ pun:'Shawarma up — dinner\'s ready.',
+ kid:'The spice blend is warm, not hot. Shredded shawarma chicken with rice, cucumber and yoghurt is a full toddler meal.',
+ ing:[['Chicken thigh fillets','700 g','M'],['Cumin + paprika + turmeric + cinnamon','2/2/1/½ tsp','P'],['Lemon','2','V'],['Garlic','4 cloves','V'],['Greek yoghurt','1 cup','D'],['Rice or pita','1½ cups / 4','P'],['Tomato','2','V'],['Cucumber','1','V'],['Red onion','½','V'],['Hummus','1 tub','P']],
+ steps:['Marinate chicken in spices, lemon juice, garlic, oil — 20 min to overnight.','Roast 210 °C ~25 min (or pan-sear) until charred at the edges; rest, slice thin.','Garlic-lemon yoghurt sauce; chop salad.','Rice or warmed pita as the base.','Stack: base, hummus, chicken, salad, white sauce.']},
+
+{id:'falafel', name:'Falafel + hummus bowls', emo:'🧆', mins:35, protein:true, h:1, tags:['medi','veg','bowls'],
+ pun:'I falafel when I skip dinner.',
+ kid:'Soft falafel crumbles perfectly for self-feeding — his with extra hummus, cucumber and pita strips.',
+ ing:[['Chickpeas','2 × 400 g tins','P'],['Onion','½','V'],['Garlic','3 cloves','V'],['Cumin + coriander (ground)','2 tsp each','P'],['Parsley + coriander (fresh)','1 bunch total','V'],['Plain flour','3 tbsp','P'],['Hummus','1 tub','P'],['Couscous','1 cup','P'],['Cherry tomatoes','1 punnet','V'],['Cucumber','1','V'],['Greek yoghurt','½ cup','D']],
+ steps:['Blitz drained chickpeas, onion, garlic, spices, herbs, flour to a coarse paste — not a purée.','Roll balls; flatten slightly. Air fry 195 °C 12–14 min with oil spray, flipping once.','Steep couscous; chop the salad.','Lemon the yoghurt.','Bowls: couscous, falafel, salad, hummus, yoghurt.']},
+
+{id:'chorizobeans', name:'Chorizo + butter bean braise', emo:'🫘', mins:30, protein:true, h:1, s:['winter','autumn'], tags:['onepan','quick'],
+ pun:'That\'s just how I chorizo roll.',
+ kid:'Chorizo runs salty and sometimes spicy — a small taste only. His plate is the beans, soft veg and bread, which he\'ll demolish.',
+ ing:[['Chorizo','2 sausages','M'],['Butter beans','2 × 400 g tins','P'],['Crushed tomatoes','400 g tin','P'],['Red capsicum','1','V'],['Onion','1','V'],['Garlic','3 cloves','V'],['Smoked paprika','1 tsp','P'],['Baby spinach','2 handfuls','V'],['Crusty bread','1 loaf','B'],['Feta (optional)','80 g','D']],
+ steps:['Brown sliced chorizo; its oil is the flavour base.','Soften onion and capsicum in it; garlic and paprika 1 min.','Tomatoes and drained beans; simmer 12 min.','Spinach through; feta over if using.','Bread for mopping. Non-negotiable.']},
+
+{id:'spanishtray', name:'Spanish chicken + chorizo traybake', emo:'🍗', mins:65, protein:true, h:1, tags:['onepan','roast'],
+ pun:'The tray in Spain roasts mainly... on the plane.',
+ kid:'His corner of the tray: chicken and potatoes, minimal chorizo (salt), tomatoes squished to sauce.',
+ ing:[['Chicken thighs, bone-in','6','M'],['Chorizo','2 sausages','M'],['Baby potatoes','700 g','V'],['Red capsicum','2','V'],['Red onion','2','V'],['Cherry tomatoes','1 punnet','V'],['Smoked paprika','2 tsp','P'],['Garlic','5 cloves','V'],['Lemon','1','V']],
+ steps:['Oven 200 °C. Toss halved potatoes, capsicum, onion, garlic with oil and paprika.','Chicken on top, skin up; sliced chorizo scattered through.','Roast 40 min.','Tomatoes in; 15 min more until everything is burnished and the chorizo oil has done its work.','Lemon over the tray. Serve from it.']},
+
+{id:'paella', name:'Chicken + prawn paella-style rice', emo:'🥘', mins:50, protein:true, h:1, s:['spring','summer'], tags:['onepan','rice'],
+ pun:'Paella the champions, my friend.',
+ kid:'Saffron rice with soft chicken and peas is toddler-friendly gold — chop his prawns small.',
+ ing:[['Chicken thigh fillets','400 g','M'],['Raw prawns, peeled','300 g','M'],['Arborio or paella rice','1½ cups','P'],['Chicken stock','4 cups','P'],['Saffron (or turmeric cheat)','pinch / ½ tsp','P'],['Red capsicum','1','V'],['Onion','1','V'],['Garlic','3 cloves','V'],['Frozen peas','1 cup','F'],['Smoked paprika','1 tsp','P'],['Lemon','1','V']],
+ steps:['Brown chunked chicken in a wide pan; set aside.','Soften onion and capsicum; garlic and paprika 1 min. Rice in, coated, 1 min.','Saffron-steeped stock in; chicken back. Simmer WITHOUT stirring, 18 min.','Prawns and peas pressed into the top for the last 6 min; lid or foil on.','Rest 5 min. The crusty bottom (socarrat) is the cook\'s tax — claim it.']},
+
+/* ---------- EXPANSION · Tex-Mex, Italy, Greece, the pub ---------- */
+{id:'enchiladas', name:'Beef enchiladas', emo:'🌯', mins:55, protein:true, f:1, tags:['texmex','batch'],
+ pun:'Tonight, you get the whole enchilada.',
+ kid:'Soft tortilla, mild saucy mince, melted cheese — cut into pinwheels for him. Assemble his from the pre-spice mince.',
+ ing:[['Beef mince','600 g','M'],['Tortillas','8','P'],['Enchilada sauce or passata + taco seasoning','700 ml / 1 sachet','P'],['Black beans','400 g tin','P'],['Onion','1','V'],['Corn kernels','1 cup','F'],['Tasty cheese','2 cups','D'],['Sour cream','small tub','D'],['Coriander','½ bunch','V']],
+ steps:['Brown mince with onion; beans, corn, half the sauce, simmer 5 min.','Fill and roll tortillas; seam-down in a baking dish.','Remaining sauce over, then cheese.','Bake 190 °C, 20–25 min until molten and blistered.','Sour cream and coriander over.']},
+
+{id:'quesadillas', name:'Chicken quesadillas', emo:'🫓', mins:20, protein:true, f:1, tags:['texmex','quick'],
+ pun:'It\'s not a big deal-a. It\'s a quesadilla.',
+ side:'Tomato, cucumber and avocado tossed with lime — done in two minutes.',
+ kid:'Crispy-soft cheese triangles are toddler currency. His without the seasoning kick.',
+ ing:[['Chicken breast or leftover roast chicken','400 g','M'],['Tortillas','6','P'],['Tasty cheese','2 cups','D'],['Capsicum','1','V'],['Corn kernels','1 cup','F'],['Taco seasoning','2 tsp','P'],['Avocado','1','V'],['Sour cream','small tub','D'],['Lime','1','V']],
+ steps:['Shred or dice cooked chicken; toss with seasoning, diced capsicum, corn.','Half-moon tortillas: cheese, filling, more cheese (cheese is the glue).','Dry pan, medium heat, 2–3 min a side, pressed with a spatula.','Rest 1 min; cut into wedges.','Smashed avo + lime + sour cream for dunking.']},
+
+{id:'fajitas', name:'Chicken fajitas', emo:'🫑', mins:25, protein:true, h:1, tags:['texmex','quick'],
+ pun:'Fajita \'bout your worries.',
+ kid:'Build-your-own is toddler theatre. His: plain chicken strips, soft capsicum, cheese, tortilla pieces.',
+ ing:[['Chicken breast, sliced','600 g','M'],['Red + green capsicum','2 total','V'],['Onion','1','V'],['Fajita or taco seasoning','1 sachet','P'],['Tortillas','8','P'],['Avocado','1','V'],['Sour cream','small tub','D'],['Lime','2','V'],['Coriander','½ bunch','V']],
+ steps:['Toss chicken in seasoning (reserve plain strips for the little one).','Ripping-hot pan: chicken 5–6 min until charred; remove.','Same pan: sliced capsicum and onion until blistered, 4 min.','Warm tortillas; smash the avo with lime.','Everything to the table in the pan. Assembly is the dinner.']},
+
+{id:'carnitas', name:'Pork carnitas tacos', emo:'🌮', mins:190, protein:true, f:1, tags:['texmex','batch'],
+ pun:'Carnitas? Carni-YES.',
+ kid:'Slow pork shreds soft as anything — his in a soft tortilla with avocado and cheese, crispy edges optional.',
+ ing:[['Pork shoulder, chunked','1.2 kg','M'],['Orange','1','V'],['Lime','2','V'],['Cumin + oregano + smoked paprika','2 tsp each','P'],['Garlic','5 cloves','V'],['Onion','1','V'],['Small tortillas','12','P'],['Coriander','1 bunch','V'],['Avocado','1','V'],['Sour cream','small tub','D']],
+ steps:['Rub pork with spices; into a pot with onion, garlic, juice of the orange + 1 lime, water to half-cover.','Lid on, oven 160 °C, 3 hrs until collapsing.','Shred; spread on a tray, ladle over some cooking liquid.','Grill 5 min until the edges crisp and catch.','Warm tortillas, pork, coriander, avocado, lime. Repeat until gone.']},
+
+{id:'nachos', name:'Loaded chilli beef nachos', emo:'🧀', mins:30, protein:true, f:1, tags:['texmex','quick'],
+ pun:'These are nacho average corn chips.',
+ kid:'The chips are a shatter risk for him — his bowl is the mild mince, beans, cheese, avocado and sour cream, spoon-style.',
+ ing:[['Beef mince','500 g','M'],['Corn chips','1 big bag','P'],['Red kidney beans','400 g tin','P'],['Taco seasoning','1 sachet','P'],['Crushed tomatoes','400 g tin','P'],['Tasty cheese','2 cups','D'],['Avocado','1','V'],['Sour cream','small tub','D'],['Lime + coriander','1 / ½ bunch','V'],['Jalapeños (adults)','to taste','P']],
+ steps:['Brown mince; seasoning, tomatoes, drained beans, simmer 10 min.','Chips on an oven tray, cheese over, grill until molten.','Chilli beef over the chips (or serve alongside to protect the crunch).','Smashed avo, sour cream, lime, coriander.','Jalapeños on the adult half only. Defend your borders.']},
+
+{id:'meatballs', name:'Meatballs in marinara + spaghetti', emo:'🍝', mins:50, protein:true, h:1, tags:['pasta','batch'],
+ pun:'Have a ball tonight.',
+ side:'A simple leaf salad with red wine vinegar dressing does the trick.',
+ kid:'Soft meatballs in mild tomato sauce = elite toddler food. Quarter his; chop the spaghetti.',
+ ing:[['Beef + pork mince (mixed)','600 g','M'],['Breadcrumbs','½ cup','P'],['Egg','1','D'],['Parmesan','½ cup + to serve','D'],['Garlic','4 cloves','V'],['Crushed tomatoes','2 × 400 g tins','P'],['Onion','1','V'],['Spaghetti','400 g','P'],['Basil','½ bunch','V'],['Milk','splash','D']],
+ steps:['Mix mince, crumbs soaked in milk, egg, parmesan, 1 minced garlic clove. Roll golf balls.','Brown meatballs; set aside (they finish in the sauce).','Same pan: onion, garlic, tomatoes; simmer 10 min.','Meatballs back in; gentle 15 min.','Toss with spaghetti; basil and parmesan over.']},
+
+{id:'cacciatore', name:'Chicken cacciatore', emo:'🍗', mins:70, protein:true, h:1, s:['winter','autumn'], tags:['onepan','batch'],
+ pun:'Winner winner, hunter\'s dinner.',
+ kid:'Braised-soft chicken and tomato sauce over pasta or mash. Skip the olives on his plate if the salt puts him off.',
+ ing:[['Chicken thighs, bone-in','6','M'],['Crushed tomatoes','2 × 400 g tins','P'],['Onion','1','V'],['Red capsicum','1','V'],['Mushrooms','200 g','V'],['Garlic','4 cloves','V'],['Kalamata olives','½ cup','P'],['Rosemary or oregano','2 sprigs / 1 tsp','V'],['Short pasta or mash','350 g / 800 g','P'],['Parsley','½ bunch','V']],
+ steps:['Brown chicken skin-down hard; set aside.','Soften onion, capsicum, mushrooms; garlic 1 min.','Tomatoes, olives, herbs; chicken nestled back in.','Simmer partly-lidded 40 min until the chicken barely holds the bone.','Over pasta or mash; parsley on top.']},
+
+{id:'tuscanchicken', name:'Creamy Tuscan chicken', emo:'🍗', mins:35, protein:true, f:1, tags:['quick'],
+ pun:'Under the Tuscan bun. Sun. Under the Tuscan sun.',
+ kid:'Creamy, mild, spinach smuggled in — slice his chicken thin and spoon sauce over pasta or mash.',
+ ing:[['Chicken breast','2 large','M'],['Thickened cream','300 ml','D'],['Sundried tomatoes','⅓ cup','P'],['Baby spinach','3 handfuls','V'],['Garlic','4 cloves','V'],['Parmesan','½ cup','D'],['Chicken stock','½ cup','P'],['Short pasta or crusty bread','350 g / 1 loaf','P'],['Italian herbs','1 tsp','P']],
+ steps:['Butterfly breasts; season and sear 4–5 min a side; rest.','Same pan: garlic and chopped sundried tomatoes 1 min.','Stock, then cream and parmesan; simmer 3 min.','Spinach wilted through; chicken back in, sauce spooned over.','With pasta or just bread and no regrets.']},
+
+{id:'bakedgnocchi', name:'Baked gnocchi + beef ragu', emo:'🥟', mins:45, protein:true, f:1, s:['winter','autumn'], tags:['pasta','batch'],
+ pun:'Gnocchi gnocchi. Who\'s there? Dinner.',
+ side:'Rocket + parmesan salad, dressed sharp, balances the cheese.',
+ kid:'Pillowy gnocchi in mild ragu with melted cheese — quarter the gnocchi for him; they\'re just the right amount of chewy.',
+ ing:[['Beef mince','500 g','M'],['Gnocchi (shelf pack)','500 g','P'],['Crushed tomatoes','2 × 400 g tins','P'],['Onion','1','V'],['Garlic','3 cloves','V'],['Zucchini (grated)','1','V'],['Mozzarella','1½ cups','D'],['Parmesan','⅓ cup','D'],['Basil','½ bunch','V']],
+ steps:['Brown mince with onion and garlic.','Tomatoes and grated zucchini; simmer 15 min.','Gnocchi straight in, uncooked; 2 min in the sauce.','Into a baking dish; both cheeses over. Bake 200 °C, 15 min until bronzed.','Basil over. Serve with a warning: lava.']},
+
+{id:'risotto', name:'Chicken + mushroom risotto', emo:'🍄', mins:45, protein:true, h:1, s:['winter','autumn'], tags:['rice'],
+ pun:'Risotto? More like ri-LOTTO — you\'ve won.',
+ kid:'Creamy rice is spoon-training heaven. His portion cooled well — risotto is molten in the middle long after it looks safe.',
+ ing:[['Chicken thigh fillets','400 g','M'],['Arborio rice','1½ cups','P'],['Mushrooms','300 g','V'],['Chicken stock','5 cups','P'],['Onion','1','V'],['Garlic','3 cloves','V'],['White wine (optional)','½ cup','P'],['Parmesan','¾ cup','D'],['Butter','40 g','D'],['Parsley','½ bunch','V']],
+ steps:['Brown chunked chicken and mushrooms; set aside.','Soften onion in butter; garlic, then rice, toasted 1 min. Wine in, if using.','Hot stock a ladle at a time, stirring, ~18 min until creamy with a slight bite.','Chicken and mushrooms back for the last 5.','Off heat: parmesan and a knob of butter beaten in. Parsley over.']},
+
+{id:'piccata', name:'Chicken piccata', emo:'🍋', mins:25, protein:true, h:1, tags:['quick'],
+ pun:'Piccata-perfect, every time.',
+ kid:'Lemon-butter chicken is mild and lovely — his sliced thin, capers off (little salt bombs).',
+ ing:[['Chicken breast','2 large','M'],['Plain flour','⅓ cup','P'],['Lemon','2','V'],['Capers','2 tbsp','P'],['Butter','60 g','D'],['Chicken stock','½ cup','P'],['Garlic','2 cloves','V'],['Spaghetti or mash','350 g / 800 g','P'],['Parsley','½ bunch','V'],['Green beans','250 g','V']],
+ steps:['Butterfly and flatten breasts; dust in seasoned flour.','Pan-fry in half the butter, 3 min a side; rest.','Same pan: garlic, stock, lemon juice, capers; bubble 2 min.','Remaining butter whisked in off the heat; chicken back to coat.','Over pasta or mash with beans; parsley over.']},
+
+{id:'beefragu', name:'Slow beef ragu pappardelle', emo:'🍝', mins:200, protein:true, f:1, s:['winter','autumn'], tags:['pasta','batch'],
+ pun:'Slow and steady wins the ragu.',
+ kid:'Shredded slow beef in tomato is soft as it gets — chop his ribbons short. Freezes into future easy nights.',
+ ing:[['Chuck steak or beef cheeks','1 kg','M'],['Crushed tomatoes','2 × 400 g tins','P'],['Red wine or extra stock','1 cup','P'],['Onion + carrot + celery','1 each','V'],['Garlic','4 cloves','V'],['Tomato paste','2 tbsp','P'],['Pappardelle','400 g','P'],['Parmesan','to serve','D'],['Rosemary','2 sprigs','V']],
+ steps:['Brown beef hard in batches.','Soften the diced veg; paste 1 min; wine to deglaze.','Everything into the pot; lid on, oven 160 °C, 3 hrs.','Shred beef into the sauce; season, reduce lid-off if loose.','Toss with pappardelle and pasta water; parmesan over.']},
+
+{id:'keftedes', name:'Greek meatballs + lemon rice', emo:'🇬🇷', mins:40, protein:true, h:1, tags:['medi'],
+ pun:'Meat me in Greece.',
+ kid:'Herby soft meatballs and lemony rice — quarter his keftedes and hold back a little tzatziki for dipping.',
+ ing:[['Beef or pork mince','600 g','M'],['Onion (grated)','1','V'],['Dried oregano + mint','1 tsp each','P'],['Breadcrumbs','½ cup','P'],['Egg','1','D'],['Rice','1½ cups','P'],['Lemon','2','V'],['Chicken stock','2¾ cups','P'],['Greek yoghurt','1 cup','D'],['Cucumber','1','V'],['Garlic','1 clove','V']],
+ steps:['Mix mince, grated onion, herbs, crumbs, egg; roll and slightly flatten.','Pan-fry 8–10 min, turning, until browned through.','Rice cooked in stock with lemon zest; juice stirred through at the end.','Quick tzatziki: yoghurt, grated squeezed cucumber, garlic.','Keftedes on lemon rice, tzatziki on everything.']},
+
+{id:'avgolemono', name:'Avgolemono (Greek lemon chicken soup)', emo:'🍋', mins:40, protein:true, h:1, s:['winter'], tags:['soup','medi'],
+ pun:'When life gives you lemons, make avgolemono.',
+ kid:'Silky, mild, rice-thickened — one of the great toddler soups. Serve his lukewarm with bread.',
+ ing:[['Chicken breast or thigh','500 g','M'],['Chicken stock','1.5 L','P'],['Rice or risoni','¾ cup','P'],['Eggs','2','D'],['Lemon','2','V'],['Carrot','1','V'],['Celery','1 stalk','V'],['Dill or parsley','½ bunch','V'],['Crusty bread','to serve','B']],
+ steps:['Poach chicken in stock with diced carrot and celery, 12 min; shred.','Rice into the broth; simmer until tender.','Whisk eggs with lemon juice; temper with ladles of hot broth, whisking.','Egg mix back into the pot OFF the boil — silky, never scrambled.','Chicken back in; dill over, bread alongside.']},
+
+{id:'porkchops', name:'Pork chops, apple + mash', emo:'🍎', mins:35, protein:true, h:1, s:['winter','autumn'], tags:['quick'],
+ pun:'Chop chop — dinner time.',
+ kid:'Pork chop sliced thin against the grain, soft apples, and mash: a full toddler dinner with zero adjustments.',
+ ing:[['Pork loin chops','3 thick','M'],['Apples','2','V'],['Potatoes','800 g','V'],['Butter','60 g','D'],['Milk','splash','D'],['Sage or thyme','6 leaves / 2 sprigs','V'],['Green beans','250 g','V'],['Cider vinegar or lemon','1 tbsp','P']],
+ steps:['Boil potatoes for mash; butter and milk, mash smooth.','Sear seasoned chops 4–5 min a side (render the fat edge first); rest.','Same pan: sliced apples in butter with herbs until golden; splash of vinegar.','Steam beans.','Chops over mash, pan apples and juices spooned over.']},
+
+{id:'bangers', name:'Bangers and mash + onion gravy', emo:'🌭', mins:35, protein:true, f:1, s:['winter','autumn'], tags:['quick'],
+ pun:'This dinner is an absolute banger.',
+ kid:'Sausage is salty — one good-quality banger sliced small is plenty, drowned (his preference) in mash and peas, light gravy.',
+ ing:[['Good pork or beef sausages','8','M'],['Potatoes','800 g','V'],['Brown onions','2','V'],['Beef stock','1½ cups','P'],['Butter','60 g','D'],['Milk','splash','D'],['Plain flour','1 tbsp','P'],['Frozen peas','2 cups','F'],['Worcestershire','dash','P']],
+ steps:['Mash: boil, butter, milk, mash.','Brown sausages slowly in a pan, ~12 min; rest.','Same pan: sliced onions low and slow 10 min; flour in 1 min.','Stock and Worcestershire whisked in; simmer to gravy.','Peas on. Mash, bangers, gravy over the top. Pub rules.']},
+
+{id:'cottagepie', name:'Cottage pie', emo:'🥧', mins:70, protein:true, h:1, s:['winter','autumn'], tags:['batch'],
+ pun:'Home is where the cottage pie is.',
+ kid:'Soft savoury mince under mash — arguably the perfect toddler dinner. Freezes in portions like it was designed for daycare weeks.',
+ ing:[['Beef mince','700 g','M'],['Potatoes','1 kg','V'],['Onion + carrot + celery','1 / 2 / 1','V'],['Frozen peas','1 cup','F'],['Tomato paste','2 tbsp','P'],['Beef stock','1½ cups','P'],['Worcestershire','1 tbsp','P'],['Butter + milk','60 g / splash','D'],['Tasty cheese','½ cup','D']],
+ steps:['Soften diced veg; mince in, browned hard.','Paste 1 min; stock and Worcestershire; simmer 15 min. Peas through.','Mash the potatoes rich with butter and milk.','Mince into a dish, mash over, forked ridges, cheese scattered.','Bake 200 °C, 20–25 min until the ridges catch.']},
+
+{id:'beefpie', name:'Slow beef + red wine pie', emo:'🥧', mins:200, protein:true, f:1, s:['winter'], tags:['batch'],
+ pun:'Sweet as pie. Well — savoury as.',
+ side:'Peas in winter; a crisp garden salad in the warm months.',
+ kid:'The filling is toddler gold once the wine has long cooked off; his serve is filling + soft under-pastry, flaky top crumbled in.',
+ ing:[['Chuck steak, chunked','900 g','M'],['Puff pastry sheets','2','F'],['Red wine','1 cup','P'],['Beef stock','1½ cups','P'],['Onion','2','V'],['Carrot','2','V'],['Mushrooms','200 g','V'],['Tomato paste','2 tbsp','P'],['Egg','1','D'],['Frozen peas (side)','2 cups','F']],
+ steps:['Brown beef hard in batches; soften onion, carrot, mushrooms.','Paste 1 min; wine to deglaze, then stock. Lid on, oven 160 °C, 2.5 hrs.','Reduce lid-off until thick and glossy; cool slightly.','Into a pie dish; puff lid on, egg-washed, vented.','Bake 210 °C, 25 min until dramatically puffed. Peas alongside.']},
+
+{id:'chickenleekpie', name:'Chicken + leek pie', emo:'🥧', mins:60, protein:true, f:1, s:['winter','autumn'], tags:['batch'],
+ pun:'A truly pie-oneering choice.',
+ side:'Peas in winter; dressed leaves and cucumber in summer.',
+ kid:'Creamy chicken and soft leek under pastry — mash his filling lightly and crumble a little of the lid over.',
+ ing:[['Chicken thigh fillets','700 g','M'],['Leeks','2','V'],['Puff pastry sheets','2','F'],['Thickened cream','300 ml','D'],['Chicken stock','½ cup','P'],['Plain flour','2 tbsp','P'],['Butter','40 g','D'],['Thyme','2 sprigs','V'],['Egg','1','D'],['Frozen peas (side)','2 cups','F']],
+ steps:['Brown chunked chicken; set aside. Soften sliced leeks in butter with thyme.','Flour in 1 min; stock then cream, whisked to a sauce. Chicken back; cool slightly.','Into a pie dish; puff lid, egg wash, vents.','Bake 210 °C, 25 min until golden and puffed.','Peas on the side. Winter, handled.']},
+
+{id:'cornedbeef', name:'Corned beef, white sauce + veg', emo:'🥩', mins:130, protein:true, h:1, s:['winter','autumn'], tags:['batch'],
+ pun:'Corned beef: a-maize-ing. No corn involved.',
+ kid:'Nanna food for a reason — soft meat, white sauce, soft veg. Corned beef is salty, so a small slice with lots of veg for him.',
+ ing:[['Corned beef silverside','1.2 kg','M'],['Potatoes','800 g','V'],['Carrots','4','V'],['Cabbage','½','V'],['Brown vinegar + brown sugar','2 tbsp each','P'],['Bay leaves','2','P'],['Butter + flour','50 g / ⅓ cup','P'],['Milk','2 cups','D'],['Dijon or hot English mustard','1 tsp','P']],
+ steps:['Silverside into a pot of water with vinegar, sugar, bay; simmer gently 1 hr 45 (about 25 min per 500 g).','Potatoes and carrots into the pot for the last 25 min; cabbage wedges the last 10.','White sauce: butter, flour, milk whisked thick; mustard in.','Rest the beef 10 min; slice against the grain.','Everything on the plate, white sauce over. Leftovers = tomorrow\'s reubens.']},
+
+{id:'rissoles', name:'Rissoles, gravy + veg', emo:'🍖', mins:35, protein:true, h:1, tags:['quick'],
+ pun:'Rissole-utely delicious.',
+ kid:'A rissole is a toddler-sized burger with vegetables already inside. His with mash and peas, gravy barely.',
+ ing:[['Beef mince','600 g','M'],['Carrot (grated)','1','V'],['Zucchini (grated, squeezed)','1','V'],['Onion (grated)','1','V'],['Breadcrumbs','½ cup','P'],['Egg','1','D'],['Worcestershire','1 tbsp','P'],['Gravy powder','2 tbsp','P'],['Potatoes','800 g','V'],['Frozen peas + corn','2 cups','F'],['Butter + milk','50 g / splash','D']],
+ steps:['Mix mince, grated veg, crumbs, egg, Worcestershire; shape 8 thick patties.','Pan-fry over medium, 5–6 min a side — don\'t rush or they\'ll scorch before cooking through.','Mash the potatoes; microwave peas and corn.','Gravy in the rissole pan, scraping up the good bits.','Stack the plate. Peak Australia achieved.']},
+
+/* ---------- salad-adjacent, the non-boring kind ---------- */
+{id:'thaibeefsalad', name:'Thai beef salad', emo:'🥩', mins:25, protein:true, h:1, s:['summer','spring'], tags:['thai','quick','lowcarb'],
+ pun:'This salad has some serious beef.',
+ kid:'The dressing bites — his plate is sliced plain steak, cucumber, soft rice and a few mild herbs.',
+ ing:[['Rump or sirloin steak','500 g','M'],['Lime','3','V'],['Fish sauce','2 tbsp','P'],['Brown sugar','2 tsp','P'],['Birdseye chilli (adults)','1–2','V'],['Cherry tomatoes','1 punnet','V'],['Cucumber','1','V'],['Red onion','½','V'],['Mint + coriander','1 bunch each','V'],['Jasmine rice (optional, for the hungry)','1 cup','P']],
+ steps:['Sear steaks hard, 2–3 min a side for medium-rare; rest a full 5 min.','Dressing: lime juice, fish sauce, sugar, minced chilli — it should bite back.','Halve tomatoes, ribbon cucumber, shave onion thin.','Slice beef thin against the grain; toss everything with a mountain of herbs.','Dressing over at the last second. Rice on the side for anyone still hungry.']},
+
+{id:'halloumisalad', name:'Warm halloumi + roast veg salad', emo:'🧀', mins:40, protein:true, h:1, tags:['medi','veg','onepan'],
+ pun:'You had me at halloumi.',
+ kid:'Halloumi is squeaky, salty fun — one or two small cubes plus the soft roast veg is his portion sorted.',
+ ing:[['Halloumi','2 blocks (360 g)','D'],['Pumpkin','600 g','V'],['Red capsicum','2','V'],['Red onion','2','V'],['Zucchini','1','V'],['Chickpeas','400 g tin','P'],['Baby spinach','3 handfuls','V'],['Honey','1 tbsp','P'],['Lemon','1','V'],['Smoked paprika','1 tsp','P']],
+ steps:['Oven 200 °C. Roast chunked pumpkin, capsicum, onion, zucchini and drained chickpeas with oil and paprika, 30 min.','Slice halloumi thick; pan-sear dry 2 min a side until deep gold.','Dressing: lemon juice, honey, olive oil.','Toss roast veg through spinach — it wilts just enough.','Halloumi over the top, dressing over everything. Warm, not a cold salad in sight.']},
+
+{id:'chickenpastasalad', name:'Chicken + bacon pasta salad', emo:'🍝', mins:25, protein:true, h:1, s:['summer'], tags:['pasta','quick'],
+ pun:'The salad that understood the assignment.',
+ kid:'Room-temp pasta, chicken and corn — a January-night classic he can eat with his hands while you eat in peace.',
+ ing:[['Chicken breast','400 g','M'],['Bacon','4 rashers','M'],['Short pasta (spirals hold dressing best)','350 g','P'],['Corn kernels','1 cup','F'],['Cherry tomatoes','1 punnet','V'],['Cucumber','1','V'],['Spring onions','3','V'],['Mayonnaise + Greek yoghurt','⅓ cup each','P'],['Dijon mustard','1 tsp','P'],['Lemon','1','V']],
+ steps:['Cook pasta; rinse briefly under cold water so it stops cooking but stays just-warm.','Pan-fry chicken and bacon; rest, then dice both.','Dressing: mayo, yoghurt, mustard, lemon juice.','Toss everything with corn, halved tomatoes, cucumber, spring onion.','Serve straight away, barely warm — built for hot nights when the oven stays off.']}
+];
+
+/* ================= APP LOGIC ================= */
+const $ = s => document.querySelector(s);
+const byId = id => RECIPES.find(r => r.id === id);
+
+const mem = {};
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem('plated:'+k); return v === null ? d : JSON.parse(v); }catch(e){ return k in mem ? mem[k] : d; } },
+  set(k, v){ try{ localStorage.setItem('plated:'+k, JSON.stringify(v)); }catch(e){ mem[k] = v; } }
+};
+
+let state = {
+  kids: store.get('kids', false),
+  healthy: store.get('healthy', false),
+  promoted: store.get('promoted', []),
+  hidden: store.get('hidden', []),
+  planned: store.get('planned', []),
+  ticked: store.get('ticked', {}),
+  lastSpin: store.get('lastSpin', null),
+  week: store.get('week', null),
+  filter: 'all',
+  showHidden: false
+};
+function save(){ ['kids','healthy','promoted','hidden','planned','ticked','lastSpin','week'].forEach(k => store.set(k, state[k])); }
+
+const visible = r => !state.hidden.includes(r.id);
+const rotation = () => RECIPES.filter(r => visible(r) && (!r.explore || state.promoted.includes(r.id)));
+const explorePool = () => RECIPES.filter(r => visible(r) && r.explore && !state.promoted.includes(r.id));
+const fmtMins = m => m >= 90 ? ((m/60).toFixed(1).replace('.0','')) + ' hr' : m + ' min';
+
+const SEASONS = {summer:'☀️ Summer', autumn:'🍂 Autumn', winter:'❄️ Winter', spring:'🌸 Spring'};
+function currentSeason(){
+  const m = new Date().getMonth() + 1;
+  if(m === 12 || m <= 2) return 'summer';
+  if(m <= 5) return 'autumn';
+  if(m <= 8) return 'winter';
+  return 'spring';
+}
+const inSeason = r => !r.s || r.s.includes(currentSeason());
+
+document.querySelectorAll('nav button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + b.dataset.tab));
+    window.scrollTo(0, 0);
+  });
+});
+
+const kidsBtn = $('#kidsBtn'), healthyBtn = $('#healthyBtn');
+function renderToggles(){
+  kidsBtn.classList.toggle('on', state.kids); kidsBtn.setAttribute('aria-pressed', state.kids);
+  healthyBtn.classList.toggle('on', state.healthy); healthyBtn.setAttribute('aria-pressed', state.healthy);
+}
+kidsBtn.addEventListener('click', () => { state.kids = !state.kids; save(); renderToggles(); renderBrowse(); renderExplore(); });
+healthyBtn.addEventListener('click', () => {
+  state.healthy = !state.healthy; save(); renderToggles();
+  const cur = state.lastSpin && byId(state.lastSpin);
+  if(state.healthy && cur && !cur.h) spin();
+});
+
+function setPlate(r){
+  $('#plateEmo').textContent = r.emo;
+  $('#plateName').textContent = r.name;
+  $('#plateMeta').textContent = fmtMins(r.mins) + (r.protein ? ' · protein' : '') + (r.h ? ' · 🌿' : '');
+  $('#punLine').textContent = r.pun;
+}
+function spin(){
+  let pool = rotation();
+  if(state.healthy) pool = pool.filter(r => r.h);
+  const noRepeat = pool.filter(r => r.id !== state.lastSpin);
+  if(noRepeat.length) pool = noRepeat;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  state.lastSpin = pick.id; save();
+  const plate = $('#plate');
+  plate.classList.remove('spin'); void plate.offsetWidth; plate.classList.add('spin');
+  setPlate(pick);
+}
+$('#plate').addEventListener('click', spin);
+$('#spinBtn').addEventListener('click', spin);
+$('#cookBtn').addEventListener('click', () => { if(state.lastSpin && byId(state.lastSpin) && visible(byId(state.lastSpin))) openSheet(state.lastSpin); else spin(); });
+
+function renderSeason(){
+  const season = currentSeason();
+  $('#seasonLabel').textContent = SEASONS[season];
+  const strip = $('#seasonStrip'); strip.innerHTML = '';
+  const picks = RECIPES.filter(r => visible(r) && r.s && r.s.includes(season) && (!r.explore || state.promoted.includes(r.id)));
+  if(!picks.length){ strip.innerHTML = '<div class="empty" style="padding:14px">Nothing pinned to this season yet.</div>'; return; }
+  picks.forEach(r => {
+    const c = document.createElement('button');
+    c.className = 'scard';
+    c.innerHTML = '<div class="emo">' + r.emo + '</div><div class="n">' + r.name + '</div><div class="t">' + fmtMins(r.mins) + '</div>';
+    c.addEventListener('click', () => openSheet(r.id));
+    strip.appendChild(c);
+  });
+}
+
+/* --- planner --- */
+const cleanName = n => n.toLowerCase().replace(/\(.*?\)/g,'').split(',')[0].trim();
+function freshSet(r){ return new Set(r.ing.filter(i => i[2] === 'V').map(i => cleanName(i[0]))); }
+function proteinType(r){
+  const m = (r.ing.find(i => i[2] === 'M') || [''])[0].toLowerCase();
+  if(/chicken/.test(m)) return 'chicken';
+  if(/beef|steak|corned|chuck/.test(m)) return 'beef';
+  if(/pork|bacon|ham|kebapi|chorizo|sausage/.test(m)) return 'pork';
+  if(/fish|salmon|prawn|tuna|barramundi|squid/.test(m)) return 'seafood';
+  return 'other';
+}
+function weekPools(){
+  return {
+    weeknight: rotation().filter(r => r.h && r.mins <= 60),
+    friday: rotation().filter(r => r.f && r.mins <= 90)
+  };
+}
+function planWeek(){
+  const {weeknight, friday} = weekPools();
+  const chosen = [];
+  const seedScored = weeknight.map(r => ({r, s:(inSeason(r) && r.s ? 1.1 : 0) + Math.random()*2}));
+  seedScored.sort((a,b) => b.s - a.s);
+  chosen.push(seedScored[0].r);
+  for(let d = 1; d < 4; d++){
+    const soFar = chosen.flatMap(c => [...freshSet(c)]);
+    const prev = proteinType(chosen[chosen.length-1]);
+    const scored = weeknight.filter(r => !chosen.includes(r)).map(r => {
+      const overlap = [...freshSet(r)].filter(x => soFar.includes(x)).length;
+      return {r, s: overlap*1.5 + (inSeason(r) && r.s ? 0.8 : 0) - (proteinType(r) === prev ? 1.2 : 0) + Math.random()*2.4};
+    });
+    scored.sort((a,b) => b.s - a.s);
+    chosen.push(scored[0].r);
+  }
+  const friOpts = friday.filter(r => !chosen.includes(r));
+  chosen.push(friOpts[Math.floor(Math.random() * friOpts.length)]);
+  state.week = chosen.map(r => r.id); save();
+  renderWeek();
+}
+function reusedItems(){
+  if(!state.week) return [];
+  const counts = {};
+  state.week.forEach(id => { const r = byId(id); if(r) freshSet(r).forEach(n => counts[n] = (counts[n]||0) + 1); });
+  return Object.entries(counts).filter(([,c]) => c >= 2).map(([n]) => n);
+}
+const DAYS = ['Mon','Tue','Wed','Thu','Fri'];
+function renderWeek(){
+  const wrap = $('#weekWrap'); wrap.innerHTML = '';
+  if(!state.week) return;
+  const rows = document.createElement('div'); rows.className = 'week-rows';
+  state.week.forEach((id, i) => {
+    const r = byId(id); if(!r) return;
+    const row = document.createElement('button');
+    row.className = 'wday' + (i === 4 ? ' fri' : '');
+    row.innerHTML = '<span class="d">' + DAYS[i] + '</span><span class="emo">' + r.emo + '</span>' +
+      '<span class="b"><span class="n">' + r.name + '</span><span class="m">' + fmtMins(r.mins) + (r.h ? ' · 🌿' : '') + '</span></span>';
+    row.addEventListener('click', () => openSheet(id));
+    rows.appendChild(row);
+  });
+  wrap.appendChild(rows);
+  const reused = reusedItems();
+  if(reused.length){
+    const note = document.createElement('div'); note.className = 'reuse-note';
+    note.textContent = '♻️ Shared across the week: ' + reused.join(', ') + ' — buy once, use twice.';
+    wrap.appendChild(note);
+  }
+  const acts = document.createElement('div'); acts.className = 'week-actions';
+  acts.innerHTML = '<button class="btn btn-ghost" id="reshuffleBtn">Reshuffle</button><button class="btn btn-primary" id="weekToList">Add all 5 to list</button>';
+  wrap.appendChild(acts);
+  $('#reshuffleBtn').addEventListener('click', planWeek);
+  $('#weekToList').addEventListener('click', () => {
+    state.week.forEach(id => { if(byId(id) && !state.planned.includes(id)) state.planned.push(id); });
+    save(); renderBrowse(); renderExplore(); renderList(); renderBadge();
+    $('#weekToList').textContent = '✓ On the list';
+  });
+}
+$('#planBtn').addEventListener('click', planWeek);
+
+/* --- cards --- */
+function card(r, opts){
+  const inList = state.planned.includes(r.id);
+  const div = document.createElement('div');
+  div.className = 'card'; div.tabIndex = 0; div.setAttribute('role','button');
+  div.innerHTML =
+    '<div class="emo">' + r.emo + '</div>' +
+    '<div class="body"><div class="name">' + r.name + '</div>' +
+    '<div class="meta"><span>' + fmtMins(r.mins) + '</span>' +
+    (r.protein ? '<span class="tag-protein">high protein</span>' : '') +
+    (r.h ? '<span class="tag-healthy">🌿 healthy</span>' : '') +
+    (state.kids ? '<span class="tag-kid">👶 kid note</span>' : '') +
+    '</div>' +
+    (opts && opts.why ? '<div class="why">💡 ' + r.why + '</div>' : '') +
+    (opts && opts.why ? '<button class="promote" data-promote="' + r.id + '">＋ Add to our rotation</button>' : '') +
+    '</div>' +
+    '<button class="addlist' + (inList ? ' in' : '') + '" data-list="' + r.id + '" aria-label="Add to grocery list">' + (inList ? '✓' : '+') + '</button>';
+  div.addEventListener('click', e => {
+    const t = e.target.closest('[data-list],[data-promote]');
+    if(t && t.dataset.list){ togglePlanned(t.dataset.list); return; }
+    if(t && t.dataset.promote){ state.promoted.push(t.dataset.promote); save(); renderExplore(); renderBrowse(); renderSeason(); return; }
+    openSheet(r.id);
+  });
+  div.addEventListener('keydown', e => { if(e.key === 'Enter') openSheet(r.id); });
+  return div;
+}
+
+const CHIPS = [['all','All'],['healthy','🌿 Healthy'],['quick','Under 30 min'],['airfryer','Air fryer'],['soup','Soups'],['roast','Roasts'],['curry','Curries'],['thai','Thai'],['medi','Mediterranean'],['balkan','Balkan'],['texmex','Tex-Mex'],['pasta','Pasta'],['batch','Batch + freeze']];
+function renderChips(){
+  const row = $('#filterChips'); row.innerHTML = '';
+  CHIPS.forEach(([key, label]) => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (state.filter === key ? ' on' : '');
+    b.textContent = label;
+    b.addEventListener('click', () => { state.filter = key; renderChips(); renderBrowse(); });
+    row.appendChild(b);
+  });
+}
+function renderBrowse(){
+  const wrap = $('#browseCards'); wrap.innerHTML = '';
+  const q = $('#searchBox').value.trim().toLowerCase();
+  let list = rotation();
+  if(state.filter === 'healthy') list = list.filter(r => r.h);
+  else if(state.filter === 'quick') list = list.filter(r => r.mins <= 30);
+  else if(state.filter !== 'all') list = list.filter(r => r.tags.includes(state.filter));
+  if(q) list = list.filter(r => r.name.toLowerCase().includes(q) || r.ing.some(i => i[0].toLowerCase().includes(q)));
+  list.sort((a,b) => a.name.localeCompare(b.name));
+  if(!list.length) wrap.innerHTML = '<div class="empty">Nothing matches. Try a different filter — or hit Explore for fresh ideas.</div>';
+  else list.forEach(r => wrap.appendChild(card(r)));
+  renderHidden();
+}
+$('#searchBox').addEventListener('input', renderBrowse);
+
+/* --- explore --- */
+function renderExplore(){
+  const wrap = $('#exploreCards'); wrap.innerHTML = '';
+  const pool = explorePool();
+  if(!pool.length){ wrap.innerHTML = '<div class="empty">You\'ve promoted (or hidden) the whole explore shelf — impressive. New ideas next update.</div>'; return; }
+  pool.forEach(r => wrap.appendChild(card(r, {why:true})));
+}
+
+/* --- hidden library --- */
+function renderHidden(){
+  const block = $('#hiddenBlock'); block.innerHTML = '';
+  if(!state.hidden.length) return;
+  const t = document.createElement('button');
+  t.className = 'hidden-toggle';
+  t.textContent = (state.showHidden ? '▾' : '▸') + ' Hidden from library (' + state.hidden.length + ')';
+  t.addEventListener('click', () => { state.showHidden = !state.showHidden; renderHidden(); });
+  block.appendChild(t);
+  if(!state.showHidden) return;
+  const rows = document.createElement('div'); rows.className = 'hidden-rows';
+  state.hidden.map(byId).filter(Boolean).sort((a,b) => a.name.localeCompare(b.name)).forEach(r => {
+    const row = document.createElement('div'); row.className = 'hrow';
+    row.innerHTML = '<span class="e">' + r.emo + '</span><span class="n">' + r.name + '</span><button class="restore">Restore</button>';
+    row.querySelector('.restore').addEventListener('click', () => {
+      state.hidden = state.hidden.filter(x => x !== r.id);
+      save(); renderBrowse(); renderExplore(); renderSeason();
+    });
+    rows.appendChild(row);
+  });
+  block.appendChild(rows);
+}
+function removeFromLibrary(id){
+  if(!state.hidden.includes(id)) state.hidden.push(id);
+  // clean grocery list
+  const pi = state.planned.indexOf(id);
+  if(pi >= 0){ state.planned.splice(pi, 1); Object.keys(state.ticked).forEach(k => { if(k.startsWith(id + '|')) delete state.ticked[k]; }); }
+  // patch the week plan: swap in a replacement from the right pool
+  if(state.week && state.week.includes(id)){
+    const slot = state.week.indexOf(id);
+    const {weeknight, friday} = weekPools();
+    const pool = (slot === 4 ? friday : weeknight).filter(r => !state.week.includes(r.id));
+    state.week[slot] = pool.length ? pool[Math.floor(Math.random() * pool.length)].id : null;
+    state.week = state.week.filter(Boolean);
+    if(state.week.length < 5) state.week = null;   // couldn't patch — clear rather than show a broken week
+  }
+  if(state.lastSpin === id) state.lastSpin = null;
+  save();
+  closeSheet();
+  renderBrowse(); renderExplore(); renderSeason(); renderWeek(); renderList(); renderBadge();
+  if(!state.lastSpin) spin();
+}
+
+/* --- grocery list --- */
+function togglePlanned(id){
+  const i = state.planned.indexOf(id);
+  if(i >= 0){
+    state.planned.splice(i, 1);
+    Object.keys(state.ticked).forEach(k => { if(k.startsWith(id + '|')) delete state.ticked[k]; });
+  } else state.planned.push(id);
+  save(); renderBrowse(); renderExplore(); renderList(); renderBadge();
+}
+function renderBadge(){
+  const tab = $('#listTab');
+  let b = tab.querySelector('.badge');
+  if(state.planned.length){
+    if(!b){ b = document.createElement('span'); b.className = 'badge'; tab.appendChild(b); }
+    b.textContent = state.planned.length;
+  } else if(b) b.remove();
+}
+function renderList(){
+  const strip = $('#plannedStrip'), groups = $('#groceryGroups'), tools = $('#listTools'), lede = $('#listLede');
+  strip.innerHTML = ''; groups.innerHTML = '';
+  if(!state.planned.length){
+    tools.style.display = 'none';
+    lede.textContent = 'Add meals from Browse or Explore and everything lands here, grouped by aisle.';
+    groups.innerHTML = '<div class="empty">The list is empty. Plan a couple of dinners and your shop builds itself.</div>';
+    return;
+  }
+  tools.style.display = 'flex';
+  lede.textContent = state.planned.length + (state.planned.length === 1 ? ' meal' : ' meals') + ' planned — here\'s the shop.';
+  state.planned.forEach(id => {
+    const r = byId(id); if(!r) return;
+    const chip = document.createElement('div'); chip.className = 'pmeal';
+    chip.innerHTML = r.emo + ' ' + r.name + ' <button class="x" aria-label="Remove ' + r.name + '">✕</button>';
+    chip.querySelector('.x').addEventListener('click', () => togglePlanned(id));
+    strip.appendChild(chip);
+  });
+  const byAisle = {};
+  state.planned.forEach(id => byId(id).ing.forEach(([name, qty, aisle]) => {
+    byAisle[aisle] = byAisle[aisle] || {};
+    const key = name.toLowerCase();
+    if(byAisle[aisle][key]) byAisle[aisle][key].count++;
+    else byAisle[aisle][key] = {name, qty, count: 1, tickKey: id + '|' + key};
+  }));
+  ['M','V','D','B','P','F'].forEach(a => {
+    if(!byAisle[a]) return;
+    const sec = document.createElement('div'); sec.className = 'aisle';
+    sec.innerHTML = '<h3>' + AISLES[a] + '</h3>';
+    Object.values(byAisle[a]).sort((x,y) => x.name.localeCompare(y.name)).forEach(item => {
+      const done = !!state.ticked[item.tickKey];
+      const row = document.createElement('button');
+      row.className = 'gitem' + (done ? ' done' : '');
+      row.innerHTML = '<span class="box">' + (done ? '✓' : '') + '</span>' +
+        '<span class="gname">' + item.name + (item.count > 1 ? ' <b>×' + item.count + '</b>' : '') + '</span>' +
+        '<span class="gqty">' + item.qty + '</span>';
+      row.addEventListener('click', () => {
+        if(state.ticked[item.tickKey]) delete state.ticked[item.tickKey];
+        else state.ticked[item.tickKey] = true;
+        save(); renderList();
+      });
+      sec.appendChild(row);
+    });
+    groups.appendChild(sec);
+  });
+}
+$('#clearTicked').addEventListener('click', () => { state.ticked = {}; save(); renderList(); });
+$('#clearAll').addEventListener('click', () => { state.planned = []; state.ticked = {}; save(); renderList(); renderBrowse(); renderExplore(); renderBadge(); });
+
+/* --- detail sheet --- */
+const sheet = $('#sheet'), sheetBg = $('#sheetBg');
+function openSheet(id){
+  const r = byId(id);
+  const inList = state.planned.includes(id);
+  $('#sheetContent').innerHTML =
+    '<div class="emo-big">' + r.emo + '</div>' +
+    '<h2>' + r.name + '</h2>' +
+    '<div class="spun">“' + r.pun + '”</div>' +
+    '<div class="smeta"><span>⏱ ' + fmtMins(r.mins) + '</span>' +
+    (r.protein ? '<span style="color:var(--accentink)">💪 high protein</span>' : '') +
+    (r.h ? '<span style="color:var(--pos)">🌿 healthy</span>' : '') +
+    '<span>serves 2 + little one</span></div>' +
+    (state.kids && r.kid ? '<div class="kidnote"><b>👶 For the little one:</b> ' + r.kid + '</div>' : '') +
+    (r.side ? '<div class="side-note">🥗 On the side: ' + r.side + '</div>' : '') +
+    '<h3>Groceries</h3><ul class="ing-list">' +
+    r.ing.map(i => '<li><span>' + i[0] + '</span><span>' + i[1] + '</span></li>').join('') +
+    '</ul><h3>Method</h3><ol class="steps">' +
+    r.steps.map(s => '<li>' + s + '</li>').join('') +
+    '</ol><div class="sheet-actions">' +
+    '<button class="btn btn-ghost" id="sheetClose">Close</button>' +
+    '<button class="btn ' + (inList ? 'btn-ghost' : 'btn-primary') + '" id="sheetAdd">' + (inList ? '✓ On the list' : 'Add to grocery list') + '</button></div>' +
+    '<button class="remove-lib" id="sheetRemove">🗑 Remove from library</button>';
+  sheet.classList.add('open'); sheetBg.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  $('#sheetClose').addEventListener('click', closeSheet);
+  $('#sheetAdd').addEventListener('click', () => { togglePlanned(id); openSheet(id); });
+  $('#sheetRemove').addEventListener('click', () => {
+    const btn = $('#sheetRemove');
+    if(btn.dataset.armed){ removeFromLibrary(id); return; }
+    btn.dataset.armed = '1'; btn.textContent = 'Tap again to confirm — restore any time from the bottom of Browse';
+  });
+  sheet.scrollTop = 0;
+}
+function closeSheet(){ sheet.classList.remove('open'); sheetBg.classList.remove('open'); document.body.style.overflow = ''; }
+sheetBg.addEventListener('click', closeSheet);
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSheet(); });
+
+/* --- boot --- */
+renderToggles(); renderChips(); renderBrowse(); renderExplore(); renderList(); renderBadge(); renderSeason(); renderWeek();
+const bootPick = state.lastSpin && byId(state.lastSpin);
+if(bootPick && visible(bootPick)) setPlate(bootPick);
+else spin();
+
+/* --- PWA: register service worker (no-op when opened as a bare file) --- */
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
