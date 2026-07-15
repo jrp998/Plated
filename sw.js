@@ -1,6 +1,6 @@
 /* Plated service worker — offline-first.
    Bump CACHE when you change index.html or icons; old caches self-purge on activate. */
-const CACHE = 'plated-v1';
+const CACHE = 'plated-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -37,4 +37,8 @@ self.addEventListener('fetch', e => {
       return res;
     }).catch(() => caches.match('./index.html')))
   );
+});
+
+self.addEventListener('message', e => {
+  if(e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
