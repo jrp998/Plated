@@ -22,6 +22,7 @@
   --accentink:#B08A0E; --pos:#2E6E63; --postxt:#E8F4F0; --wash:#E7EDF2; --line:#D2DAE2;
   --sub:#5E6B80; --puncol:#4E6180; --metal:#C8CDD6;
   --safe:max(22px, env(safe-area-inset-bottom, 0px));
+  --navh:calc(56px + var(--safe));
   --disp:'Iowan Old Style','Palatino Linotype','Book Antiqua',Georgia,serif;
   --body:-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
   --r:18px;
@@ -30,7 +31,7 @@
 html{height:100%}
 body{
   font-family:var(--body); background:var(--paper); color:var(--ink);
-  min-height:100%; padding-bottom:calc(84px + var(--safe));
+  min-height:100%; padding-bottom:calc(var(--navh) + 28px);
   -webkit-font-smoothing:antialiased;
 }
 button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
@@ -239,10 +240,11 @@ button:focus-visible,.card:focus-visible,input:focus-visible{outline:2.5px solid
 .swap-pill{padding:7px 12px;border-radius:999px;background:var(--wash);font-size:12.5px;font-weight:700;color:var(--ink);border:1.5px solid transparent}
 .swap-pill.on{background:var(--head);color:#F5F8FB}
 .chain-note{display:block;width:100%;text-align:left;font-size:13px;color:var(--accentink);background:#FBF3D8;border:1.5px dashed var(--accent);border-radius:12px;padding:10px 12px;margin:12px 0 0;line-height:1.5;font-weight:600}
-.update-banner{position:fixed;left:12px;right:12px;bottom:calc(72px + var(--safe));z-index:70;background:var(--head);color:#F5F8FB;border:2px solid var(--accent);border-radius:16px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;font-weight:700;transform:translateY(200%);transition:transform .3s;max-width:536px;margin:0 auto;box-shadow:0 10px 30px rgba(18,32,58,.4)}
-.update-banner.show{transform:translateY(0)}
-.update-banner button{background:var(--accent);color:var(--accenttxt);border-radius:10px;padding:8px 14px;font-weight:800;font-size:13px}
-.toast{position:fixed;left:50%;bottom:calc(78px + var(--safe));transform:translate(-50%,200%);z-index:75;background:var(--ink);color:#F5F8FB;border-radius:999px;padding:11px 20px;font-size:13.5px;font-weight:600;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis;transition:transform .3s;box-shadow:0 8px 24px rgba(18,32,58,.35)}
+.update-banner{position:fixed;left:12px;right:12px;bottom:calc(var(--navh) + 14px);z-index:88;pointer-events:none;background:var(--head);color:#F5F8FB;border:2px solid var(--accent);border-radius:16px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;font-weight:700;transform:translateY(200%);transition:transform .3s;max-width:536px;margin:0 auto;box-shadow:0 10px 30px rgba(18,32,58,.4)}
+.update-banner.show{transform:translateY(0);pointer-events:auto}
+.update-banner #updateRestart{background:var(--accent);color:var(--accenttxt);border-radius:10px;padding:11px 16px;font-weight:800;font-size:13.5px;min-height:44px;flex:0 0 auto}
+.update-banner .dismiss{background:transparent;color:rgba(245,248,251,.75);font-size:19px;padding:6px 4px;min-width:34px;min-height:38px;line-height:1;flex:0 0 auto}
+.toast{position:fixed;left:50%;bottom:calc(var(--navh) + 12px);transform:translate(-50%,240%);z-index:78;pointer-events:none;background:var(--ink);color:#F5F8FB;border-radius:999px;padding:11px 20px;font-size:13.5px;font-weight:600;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis;transition:transform .3s;box-shadow:0 8px 24px rgba(18,32,58,.35)}
 .toast.show{transform:translate(-50%,0)}
 .egg{position:fixed;inset:0;z-index:90;background:rgba(18,32,58,.78);display:none;overflow:hidden}
 .egg.show{display:block}
@@ -428,9 +430,10 @@ button:focus-visible,.card:focus-visible,input:focus-visible{outline:2.5px solid
   <div id="groceryGroups"></div>
 </section>
 
-<div class="update-banner" id="updateBanner">
-  <span>✨ Update ready</span>
+<div class="update-banner" id="updateBanner" role="status">
+  <span style="flex:1">✨ Update ready</span>
   <button id="updateRestart">Restart now</button>
+  <button class="dismiss" id="updateDismiss" aria-label="Dismiss">✕</button>
 </div>
 <div class="toast" id="toast"></div>
 <div class="egg" id="egg" aria-hidden="true"></div>
@@ -1237,7 +1240,7 @@ const RECIPES = [
 /* ================= APP LOGIC (v2) ================= */
 const $ = s => document.querySelector(s);
 const byId = id => RECIPES.find(r => r.id === id);
-const APP_VERSION = 'v2.1';
+const APP_VERSION = 'v2.2';
 
 /* --- storage --- */
 const mem = {};
@@ -1410,7 +1413,7 @@ function setPlate(r){
 function friedChickenStorm(){
   const egg = $('#egg');
   const SPR = ['spDrum','spDrum','spDrum','spPop','spPop','spTender','spBucket'];   // drumsticks dominate, bucket is the rare one
-  egg.innerHTML = '<div class="egg-text">STOP TAPPING —<br>you know what you want<small>🍗 Monika\'s Law</small></div>';
+  egg.innerHTML = '<div class="egg-text">STOP TAPPING —<br>you know what you want</div>';
   for(let i = 0; i < 26; i++){
     const spr = SPR[Math.floor(Math.random() * SPR.length)];
     const size = spr === 'spBucket' ? 54 + Math.random()*26 : 30 + Math.random()*34;
@@ -1869,12 +1872,23 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSheet();
 
 /* --- settings + updates --- */
 let swReg = null, swWaiting = null;
+function doRestart(){
+  const btn = $('#updateRestart');
+  btn.textContent = 'Restarting…';
+  const waiting = swWaiting || (swReg && swReg.waiting);
+  if(waiting){
+    waiting.postMessage({type:'SKIP_WAITING'});
+    // controllerchange normally reloads us; this is the belt-and-braces timeout
+    setTimeout(() => location.reload(), 1500);
+    return;
+  }
+  // no waiting worker (state lost, or banner shown late) — nuke caches and hard reload
+  const done = () => location.reload();
+  if(window.caches) caches.keys().then(ks => Promise.all(ks.map(k => caches.delete(k)))).then(done).catch(done);
+  else done();
+}
 function showUpdateBanner(){
-  const b = $('#updateBanner');
-  b.classList.add('show');
-  $('#updateRestart').onclick = () => {
-    if(swWaiting) swWaiting.postMessage({type:'SKIP_WAITING'});
-  };
+  $('#updateBanner').classList.add('show');
 }
 function openSettings(){
   $('#sheetContent').innerHTML =
@@ -1905,6 +1919,10 @@ function openSettings(){
   sheet.scrollTop = 0;
 }
 $('#gearBtn').addEventListener('click', openSettings);
+
+/* --- update banner wiring (bound once) --- */
+$('#updateRestart').addEventListener('click', doRestart);
+$('#updateDismiss').addEventListener('click', () => $('#updateBanner').classList.remove('show'));
 
 /* --- boot --- */
 renderToggles(); renderChips(); renderBrowse(); renderExplore(); renderList(); renderBadge(); renderSeason(); renderWeek();
