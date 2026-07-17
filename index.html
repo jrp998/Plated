@@ -1895,7 +1895,7 @@ const RECIPES = [
 /* ================= APP LOGIC (v2) ================= */
 const $ = s => document.querySelector(s);
 const byId = id => RECIPES.find(r => r.id === id);
-const APP_VERSION = 'v5.0';
+const APP_VERSION = 'v5.1';
 
 /* --- storage --- */
 const mem = {};
@@ -2530,20 +2530,32 @@ function removeFromLibrary(id){
 
 /* --- ingredient normalisation: split compound lines, strip descriptors --- */
 const KEEP_WHOLE = [/peas \+ corn/i, /salt & pepper/i, /mayo \+ mustard \+ tomato sauce/i];
+/* compounds where a naive split leaves an orphan adjective ("Red", "Soy", "Beef") */
+const ALIAS = {
+  'red + green capsicum': ['Red capsicum', 'Green capsicum'],
+  'soy + fish sauce': ['Soy sauce', 'Fish sauce'],
+  'beef + pork mince': ['Beef mince', 'Pork mince'],
+  'butter + milk': ['Butter', 'Milk'],
+  'butter + flour': ['Butter', 'Plain flour']
+};
 const baseName = n => n.split('(')[0].split(',')[0].trim();
+const tidyName = s => { s = s.replace(/^grated\s+/i, '').trim(); return s.charAt(0).toUpperCase() + s.slice(1); };
+function splitQtys(qty, count){
+  if(/\beach\b/i.test(qty)){ const q = qty.replace(/\s*each\s*$/i, '').trim(); return Array(count).fill(q); }
+  if(qty.includes('/')) { const parts = qty.split('/').map(q => q.trim()); return Array.from({length:count}, (_, i) => parts[i] !== undefined ? parts[i] : ''); }
+  return Array(count).fill(qty);
+}
 function normaliseIng(name, qty, aisle){
-  if(name.includes(' + ') && !KEEP_WHOLE.some(re => re.test(name))){
-    const parts = name.split(' + ').map(p => p.trim());
-    let qtys;
-    if(/\beach\b/i.test(qty)){
-      const q = qty.replace(/\s*each\s*$/i, '').trim();
-      qtys = parts.map(() => q);
-    } else if(qty.includes(' / ') || qty.includes('/')){
-      qtys = qty.split('/').map(q => q.trim());
-    } else qtys = parts.map(() => qty);
-    return parts.map((p, i) => [baseName(p.charAt(0).toUpperCase() + p.slice(1)), qtys[i] !== undefined ? qtys[i] : qty, aisle]);
-  }
-  return [[baseName(name), qty, aisle]];
+  if(KEEP_WHOLE.some(re => re.test(name))) return [[baseName(name), qty, aisle]];
+  /* strip the descriptor FIRST — otherwise "Squid tubes, scored + sliced" splits into an orphan "sliced",
+     which downstream fuzzy-matchers happily resolve to something absurd (it was matching Ham) */
+  const clean = baseName(name);
+  const alias = ALIAS[clean.toLowerCase()];
+  if(alias){ const qs = splitQtys(qty, alias.length); return alias.map((a, i) => [a, qs[i] || qty, aisle]); }
+  if(!clean.includes(' + ')) return [[tidyName(clean), qty, aisle]];
+  const parts = clean.split(' + ').map(p => p.trim());
+  const qs = splitQtys(qty, parts.length);
+  return parts.map((p, i) => [tidyName(p), qs[i] !== undefined && qs[i] !== '' ? qs[i] : qty, aisle]);
 }
 
 /* --- pantry staples + home-grown herbs (skipped on export) --- */

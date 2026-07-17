@@ -1,6 +1,6 @@
 /* Plated service worker — offline-first.
    Bump CACHE when you change index.html or icons; old caches self-purge on activate. */
-const CACHE = 'plated-v9';
+const CACHE = 'plated-v10';
 const ASSETS = [
   './',
   './index.html',
