@@ -363,6 +363,17 @@ h2,.wordmark,.plate .pname,.sheet h3{font-variation-settings:"SOFT" 30,"WONK" 0}
 .dishart-s{width:44px;height:44px;display:block;margin:0 auto}
 .dishart-w{width:34px;height:34px;display:block}
 .plate .food:has(.dishart-plate){font-size:0}
+
+.quick-toggle{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;max-width:360px;margin-top:10px;
+  border:1.5px solid var(--line);border-radius:14px;padding:11px;font-size:13.5px;font-weight:700;color:var(--sub);background:#fff;transition:all .2s}
+.quick-toggle small{font-weight:600;opacity:.75;font-size:11.5px}
+.quick-toggle .bolt{filter:grayscale(1);opacity:.5;transition:all .2s}
+.quick-toggle.on{background:var(--accent);border-color:var(--accent);color:var(--accenttxt)}
+.quick-toggle.on .bolt{filter:none;opacity:1}
+.quick-toggle.on small{opacity:.8}
+.plan-row{display:flex;gap:10px;margin-top:10px}
+.plan-row .btn{flex:1;font-size:13.5px;padding:13px 8px}
+.btn-quick{background:var(--wash);color:var(--ink);border:1.5px solid var(--accent)}
 </style>
 </head>
 <body>
@@ -646,6 +657,9 @@ h2,.wordmark,.plate .pname,.sheet h3{font-variation-settings:"SOFT" 30,"WONK" 0}
       <button data-tier="solid">No treats</button>
     </div>
     <div class="seg-hint" id="segHint"></div>
+    <button class="quick-toggle" id="quickBtn" aria-pressed="false">
+      <span class="bolt">⚡</span> Quick only <small>under 35 min</small>
+    </button>
     <div class="tap-hint" id="tapHint">👆 Tap the plate to begin</div>
     <div class="plate-actions">
       <button class="btn btn-primary" id="cookBtn">Open recipe</button>
@@ -657,7 +671,10 @@ h2,.wordmark,.plate .pname,.sheet h3{font-variation-settings:"SOFT" 30,"WONK" 0}
   </div>
   <div class="week-block">
     <div class="eyebrow">The week ahead</div>
-    <button class="btn btn-forest" id="planBtn" style="width:100%;margin-top:10px">🗓️ Plan my week</button>
+    <div class="plan-row">
+      <button class="btn btn-forest" id="planBtn">🗓️ Plan my week</button>
+      <button class="btn btn-quick" id="planQuickBtn">⚡ Quick week</button>
+    </div>
     <div id="weekWrap"></div>
   </div>
 </section>
@@ -1895,7 +1912,7 @@ const RECIPES = [
 /* ================= APP LOGIC (v2) ================= */
 const $ = s => document.querySelector(s);
 const byId = id => RECIPES.find(r => r.id === id);
-const APP_VERSION = 'v5.1';
+const APP_VERSION = 'v5.2';
 
 /* --- storage --- */
 const mem = {};
@@ -1915,6 +1932,8 @@ let state = {
   week: store.get('week', null),
   protein: store.get('protein', {}),                // recipeId -> alt index (undefined = original)
   spinHistory: store.get('spinHistory', []),
+  quickOnly: store.get('quickOnly', false),
+  weekQuick: store.get('weekQuick', false),
   cooked: store.get('cooked', {}),          // recipeId -> [timestamps]
   seenOnboard: store.get('seenOnboard', false),
   noHaptics: store.get('noHaptics', false),
@@ -1923,7 +1942,7 @@ let state = {
   filter: 'all',
   showHidden: false
 };
-function save(){ ['kids','spinTier','promoted','hidden','planned','ticked','lastSpin','week','protein','serves','spinHistory','skipStaples','cooked','seenOnboard','noHaptics'].forEach(k => store.set(k, state[k])); }
+function save(){ ['kids','spinTier','promoted','hidden','planned','ticked','lastSpin','week','protein','serves','spinHistory','skipStaples','cooked','seenOnboard','noHaptics','quickOnly','weekQuick'].forEach(k => store.set(k, state[k])); }
 
 const visible = r => !state.hidden.includes(r.id);
 const rotation = () => RECIPES.filter(r => visible(r) && !r.yy && (!r.explore || state.promoted.includes(r.id)));
@@ -1948,6 +1967,7 @@ function agoText(id){
   if(d < 60) return 'cooked ' + Math.round(d/7) + ' weeks ago';
   return 'not since ' + new Date(lastCooked(id)).toLocaleDateString('en-AU',{month:'long'});
 }
+const QUICK_MINS = 35;      // a weeknight ceiling, not a stopwatch
 const PREMIUM = ['prawnspag','honeyprawns','paella'];   // priced out of the auto-planner; spin/browse unaffected
 const TIER_TAG = {light:'🌿 light', solid:'', treat:'🎉 treat'};
 /* original dish illustrations — drawn, not stock. Everything else falls back to emoji. */
@@ -2145,11 +2165,13 @@ function renderToggles(){
   kidsBtn.classList.toggle('on', state.kids);
   kidsBtn.setAttribute('aria-pressed', state.kids);
   document.querySelectorAll('#tierSeg button').forEach(b => b.classList.toggle('on', b.dataset.tier === state.spinTier));
+  const qb = $('#quickBtn');
+  if(qb){ qb.classList.toggle('on', state.quickOnly); qb.setAttribute('aria-pressed', state.quickOnly); }
   const HINTS = {any:'Every recipe in the rotation', light:'Lean + veg-forward picks only', solid:'Light and solid meals — hides the Friday treats'};
   const sh = $('#segHint');
   if(sh){
     const pool = rotation().filter(tierOK).length;
-    sh.textContent = (state.kids ? '👶 Kid-friendly only · ' : '') + (HINTS[state.spinTier] || '') + ' · ' + pool + ' meals';
+    sh.textContent = (state.kids ? '👶 Kid-friendly · ' : '') + (state.quickOnly ? '⚡ Under 35 min · ' : '') + (HINTS[state.spinTier] || '') + ' · ' + pool + ' meals';
   }
 }
 kidsBtn.addEventListener('click', openKidsSheet);
@@ -2201,12 +2223,18 @@ function yyCard(r){
   });
   return div;
 }
+$('#quickBtn').addEventListener('click', () => {
+  state.quickOnly = !state.quickOnly; save(); renderToggles(); buzz('tick');
+  const cur = state.lastSpin && byId(state.lastSpin);
+  if(cur && !tierOK(cur)) spin();
+});
 document.querySelectorAll('#tierSeg button').forEach(b => b.addEventListener('click', () => {
   state.spinTier = b.dataset.tier; save(); renderToggles();
   const cur = state.lastSpin && byId(state.lastSpin);
   if(cur && !tierOK(cur)) spin();
 }));
 function tierOK(r){
+  if(state.quickOnly && r.mins > QUICK_MINS) return false;
   if(state.kids && !r.kf) return false;          // kid mode: only meals that work for Mason
   if(state.spinTier === 'light') return r.tier === 'light';
   if(state.spinTier === 'solid') return r.tier !== 'treat';
@@ -2306,8 +2334,10 @@ function proteinType(r){
   return 'other';
 }
 function weekPools(){
+  // Friday is deliberately left long — that's the night you've got time
+  const cap = state.weekQuick ? QUICK_MINS : 60;
   return {
-    weeknight: rotation().filter(r => r.tier !== 'treat' && r.mins <= 60 && !PREMIUM.includes(r.id)),
+    weeknight: rotation().filter(r => r.tier !== 'treat' && r.mins <= cap && !PREMIUM.includes(r.id)),
     friday: rotation().filter(r => r.f && r.mins <= 90 && !PREMIUM.includes(r.id))
   };
 }
@@ -2322,7 +2352,8 @@ function scoreCandidate(r, others, prevProtein){
     + (prevProtein && proteinType(r) === prevProtein ? -1.2 : 0)
     + Math.random()*2.4;
 }
-function planWeek(){
+function planWeek(quick){
+  state.weekQuick = !!quick;
   const {weeknight, friday} = weekPools();
   const chosen = [];
   const seed = weeknight.map(r => ({r, s:(inSeason(r) && r.s ? 1.1 : 0) + (r.tier === 'light' ? .5 : 0) + Math.random()*2})).sort((a,b) => b.s - a.s)[0].r;
@@ -2394,7 +2425,7 @@ function renderWeek(){
   });
   wrap.appendChild(rows);
   const hint = document.createElement('div'); hint.className = 'swipe-hint';
-  hint.textContent = 'Swipe a day right (or tap ⟳) to swap it for a fresh pick.';
+  hint.textContent = (state.weekQuick ? '⚡ Quick week — weeknights under ' + QUICK_MINS + ' min, Friday off the leash. ' : '') + 'Swipe a day right (or tap ⟳) to swap it.';
   wrap.appendChild(hint);
   const reused = reusedItems();
   if(reused.length){
@@ -2405,14 +2436,15 @@ function renderWeek(){
   const acts = document.createElement('div'); acts.className = 'week-actions';
   acts.innerHTML = '<button class="btn btn-ghost" id="reshuffleBtn">Reshuffle all</button><button class="btn btn-primary" id="weekToList">Add all 5 to list</button>';
   wrap.appendChild(acts);
-  $('#reshuffleBtn').addEventListener('click', planWeek);
+  $('#reshuffleBtn').addEventListener('click', () => planWeek(state.weekQuick));
   $('#weekToList').addEventListener('click', () => {
     state.week.forEach(id => { if(byId(id) && !state.planned.includes(id)) state.planned.push(id); });
     save(); renderBrowse(); renderExplore(); renderList(); renderBadge();
     $('#weekToList').textContent = '✓ On the list';
   });
 }
-$('#planBtn').addEventListener('click', planWeek);
+$('#planBtn').addEventListener('click', () => planWeek(false));
+$('#planQuickBtn').addEventListener('click', () => planWeek(true));
 $('#yyBack').addEventListener('click', () => switchView('view-tonight', 'tonight'));
 
 /* --- cards --- */
